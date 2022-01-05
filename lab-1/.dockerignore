@@ -1,0 +1,7 @@
+node_modules/
+dist/
+target/
+.git/
+k8s/
+Makefile
+README.md

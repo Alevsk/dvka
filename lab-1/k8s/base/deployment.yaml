@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nft-store
+  namespace: lab-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nft-store
+  template:
+    metadata:
+      labels:
+        app: nft-store
+    spec:
+      serviceAccountName: lab-1-sa
+      containers:
+        - name: nft-store
+          env:
+            - name: DVKA-LAB1-FLAG
+              value: "challenge-flag-here"
+            - name: DVKA-LAB1-SIGNING-KEY
+              valueFrom:
+                secretKeyRef:
+                  name: signing-key
+                  key: key
+          ports:
+            - containerPort: 8080
+              name: http
+          image: alevsk/dvka:lab-1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
