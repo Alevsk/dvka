@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+    <meta name="apple-mobile-web-app-title" content="CodePen">
+    <link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+    <link rel="mask-icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+    <title>Is it up? - Enterprise grade network debugging console</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <style>
+        .lds-facebook {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .lds-facebook div {
+            display: inline-block;
+            position: absolute;
+            left: 8px;
+            width: 16px;
+            background: #3F3F3F;
+            animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+        }
+        .lds-facebook div:nth-child(1) {
+            left: 8px;
+            animation-delay: -0.24s;
+        }
+        .lds-facebook div:nth-child(2) {
+            left: 32px;
+            animation-delay: -0.12s;
+        }
+        .lds-facebook div:nth-child(3) {
+            left: 56px;
+            animation-delay: 0;
+        }
+        @keyframes lds-facebook {
+            0% {
+                top: 8px;
+                height: 64px;
+            }
+            50%, 100% {
+                top: 24px;
+                height: 32px;
+            }
+        }
+        #search-box {
+            position: relative;
+            width: 100%;
+            margin: 0;
+        }
+        #search-form
+        {
+            height: 40px;
+            border: 1px solid #999;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+        #search-text
+        {
+            width: 60%;
+            font-size: 14px;
+            color: #ddd;
+            border-width: 0;
+            background: transparent;
+        }
+        #search-box input[type="text"]
+        {
+
+            padding: 11px 0 12px 1em;
+            color: #333;
+            outline: none;
+        }
+        #search-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 42px;
+            width: 80px;
+            font-size: 14px;
+            color: #fff;
+            text-align: center;
+            line-height: 42px;
+            border-width: 0;
+            background-color: #4d90fe;
+            -webkit-border-radius: 0px 5px 5px 0px;
+            -moz-border-radius: 0px 5px 5px 0px;
+            border-radius: 0px 5px 5px 0px;
+            cursor: pointer;
+        }
+        #search-select {
+            top: 0;
+            right: 0;
+            height: 42px;
+            font-size: 14px;
+            color: #fff;
+            text-align: center;
+            line-height: 42px;
+            border-width: 0;
+            background-color: #333333;
+            cursor: pointer;
+        }
+        /* Ignore this! */
+        body {
+            background-color:#EDEDE8;
+            font:normal normal 16px/1.4 "Open Sans",Segoe,"Segoe UI",Frutiger,"Frutiger Linotype","DejaVu Sans","Helvetica Neue",Arial,Sans-Serif;
+            color:#333;
+            text-shadow:0 1px 0 white;
+            padding:10px 0 0 10px;
+            margin:5%;
+        }
+        p, pre {margin:0 10px 10px 0}
+        code {
+            font-family:Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,Monospace,serif;
+            font-size:14px;
+        }
+        pre {
+            line-height:1.2;
+            background-color:white;
+            padding:1em;
+            overflow:auto;
+            border-radius:3px;
+            box-shadow:0 1px 1px rgba(0,0,0,.1);
+            min-height: 500px;
+        }
+        h3 {
+            font-weight:bold;
+            margin:20px 10px 10px 0;
+        }
+        .ChooseColor input[type="color"]
+        {
+            width: 5%;
+            -webkit-border-radius: 50px;
+            -moz-border-radius:50px;
+            border-radius:50px;
+            cursor: pointer;
+            padding:5px;
+        }
+        .hide {
+            display: none;
+        }
+        #admin-panel {
+            text-align: center;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 15px;
+        }
+    </style>
+    <script>
+        window.console = window.console || function(t) {};
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+    <script>
+        if (document.location.search.match(/type=embed/gi)) {
+            window.parent.postMessage("resize", "*");
+        }
+    </script>
+</head>
+<body translate="no" >
+<h3>Is it up? - Enterprise grade network debugging console</h3>
+<p>For security reasons all queries to internal resources are disabled</p>
+<div id='search-box'>
+    <form id='search-form'>
+        <select id='search-select' name="command">
+            <option value="ping">PING</option>
+            <option value="curl">CURL</option>
+            <option value="nslookup">NSLOOKUP</option>
+            <option value="dig">DIG</option>
+        </select>
+        <input id='search-text' name='hostname' placeholder='Hostname' type='text' autocomplete="off"/>
+        <button id='search-button'><span>Run</span></button>
+    </form>
+</div>
+<h3>Debug logs</h3>
+<pre><div id="loader" class="lds-facebook hide"><div></div><div></div><div></div></div><code id="search-logs"></code></pre>
+<center><a href="http://admin-panel.lab-2.svc.cluster.local:8080/admin" id="admin-panel">Admin panel</a></center>
+</body>
+<script>
+
+    function EntitiesHtml(string) {
+        return String(string).replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    }
+
+    const runCommand = (event) => {
+        event.preventDefault();
+
+        document.getElementById("search-logs").innerHTML = "";
+        document.getElementById("loader").classList.toggle("hide")
+
+        const xHTTP = new XMLHttpRequest();
+        xHTTP.onreadystatechange = function() {
+            if (xHTTP.readyState === 4) {
+                if (xHTTP.status === 200) {
+                    document.getElementById("loader").classList.toggle("hide")
+                    document.getElementById("search-logs").innerHTML = EntitiesHtml(xHTTP.response);
+                } else {
+                    document.getElementById("loader").classList.toggle("hide")
+                    alert("something went wrong...\n\n" + xHTTP.response)
+                }
+            }
+        }
+
+        const command = document.getElementById("search-select").value;
+        const hostname = document.getElementById("search-text").value
+
+        xHTTP.open("POST", "/api/v1/run");
+        const data = {
+            command: command,
+            hostname: hostname
+        }
+        xHTTP.send(JSON.stringify(data));
+        return false;
+    }
+    document.getElementById("search-form").addEventListener("submit", runCommand);
+</script>
+</html>

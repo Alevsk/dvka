@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: debug-console
+  labels:
+    app: debug-console
+  namespace: lab-2
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: debug-console
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-panel
+  labels:
+    app: admin-panel
+  namespace: lab-2
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: admin-panel

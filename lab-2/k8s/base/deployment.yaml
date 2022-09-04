@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debug-console
+  namespace: lab-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: debug-console
+  template:
+    metadata:
+      labels:
+        app: debug-console
+    spec:
+      containers:
+        - name: debug-console
+          ports:
+            - containerPort: 8080
+              name: http
+          image: alevsk/dvka:lab-2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-panel
+  namespace: lab-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-panel
+  template:
+    metadata:
+      labels:
+        app: admin-panel
+    spec:
+      containers:
+        - name: admin-panel
+          env:
+            - name: DVKA_LAB2_FLAG
+              value: "flag{challenge-flag-here}"
+            - name: DVKA_LAB2_ADMIN_PANEL
+              value: "on"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 8080
+              name: http
+          image: alevsk/dvka:lab-2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true

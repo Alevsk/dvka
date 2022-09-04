@@ -1,0 +1,103 @@
+/*
+// Responsive Search Box Widget
+// Made with ❤ by @Pawan_Mall
+// http://www.pawanmall.net
+*/
+
+#search-box {
+    position: relative;
+    width: 100%;
+    margin: 0;
+}
+
+#search-form
+{
+    height: 40px;
+    border: 1px solid #999;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background-color: #fff;
+    overflow: hidden;
+}
+#search-text
+{
+    font-size: 14px;
+    color: #ddd;
+    border-width: 0;
+    background: transparent;
+}
+#search-box input[type="text"]
+{
+    width: 90%;
+    padding: 11px 0 12px 1em;
+    color: #333;
+    outline: none;
+}
+
+#search-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 42px;
+    width: 80px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+    line-height: 42px;
+    border-width: 0;
+    background-color: #4d90fe;
+    -webkit-border-radius: 0px 5px 5px 0px;
+    -moz-border-radius: 0px 5px 5px 0px;
+    border-radius: 0px 5px 5px 0px;
+    cursor: pointer;
+}
+
+
+
+
+
+/* Ignore this! */
+body {
+    background-color:#EDEDE8;
+    font:normal normal 16px/1.4 "Open Sans",Segoe,"Segoe UI",Frutiger,"Frutiger Linotype","DejaVu Sans","Helvetica Neue",Arial,Sans-Serif;
+    color:#333;
+    text-shadow:0 1px 0 white;
+    padding:10px 0 0 10px;
+    margin:5%;
+}
+
+p, pre {margin:0 10px 10px 0}
+
+code {
+    font-family:Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,Monospace;
+    font-size:14px;
+}
+
+pre {
+    line-height:1.2;
+    background-color:white;
+    padding:1em;
+    overflow:auto;
+    border-radius:3px;
+    box-shadow:0 1px 1px rgba(0,0,0,.1);
+}
+
+.cm {
+    color:#999;
+    font-style:italic;
+}
+
+h3 {
+    font-weight:bold;
+    margin:20px 10px 10px 0;
+}
+.ChooseColor input[type="color"]
+{
+    width: 5%;
+    -webkit-border-radius: 50px;
+    -moz-border-radius:50px;
+    border-radius:50px;
+    cursor: pointer;
+    padding:5px;
+}

@@ -4,11 +4,11 @@ import "github.com/dgrijalva/jwt-go"
 import "github.com/minio/pkg/env"
 
 func GetSigningKEy() string {
-	return env.Get("DVKA-LAB1-SIGNING-KEY", "334f4b53-609c-4737-9d59-a71720b00cb8")
+	return env.Get("DVKA_LAB1_SIGNING_KEY", "")
 }
 
 func GetFlag() string {
-	return env.Get("DVKA-LAB1-FLAG", "theflag")
+	return env.Get("DVKA_LAB1_FLAG", "flag{}")
 }
 
 type customClaims struct {

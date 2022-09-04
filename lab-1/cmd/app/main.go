@@ -163,6 +163,7 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "Sorry, something went wrong.")
 				return
 			}
+			r.Body.Close()
 			var params DownloadMoreNFTRequest
 			err = json.Unmarshal(body, &params)
 			if err != nil {
@@ -198,6 +199,7 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "Sorry, something went wrong.")
 				return
 			}
+			resp.Body.Close()
 			response := &DownloadMoreNFTResponse{
 				Status:  resp.Status,
 				Message: string(respBody),
