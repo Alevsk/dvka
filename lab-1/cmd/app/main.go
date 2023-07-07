@@ -4,8 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 )
 
 func app(w http.ResponseWriter, r *http.Request) {
@@ -99,9 +100,16 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 				jwtCookie[1],
 				&customClaims{},
 				func(token *jwt.Token) (interface{}, error) {
-					return []byte(GetSigningKEy()), nil
+					signingKey := getSigningKey()
+					return []byte(signingKey), nil
 				},
 			)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "Sorry, something went wrong.")
+				return
+			}
 
 			claims, ok := token.Claims.(*customClaims)
 			if !ok {
@@ -128,7 +136,8 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 			}
 
 			newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, updatedClaims)
-			signedToken, err := newToken.SignedString([]byte(GetSigningKEy()))
+			signingKey := getSigningKey()
+			signedToken, err := newToken.SignedString([]byte(signingKey))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, "Sorry, something went wrong.")
@@ -147,7 +156,8 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 				},
 			}
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			signedToken, err := token.SignedString([]byte(GetSigningKEy()))
+			signingKey := getSigningKey()
+			signedToken, err := token.SignedString([]byte(signingKey))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, "Sorry, something went wrong.")

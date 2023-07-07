@@ -1,6 +1,6 @@
-FROM golang:1.17 as golayer
+FROM golang:1.19 as golayer
 
-RUN apt-get update -y && apt-get install -y ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates
 
 ADD go.mod /go/src/github.com/Alevsk/dvka/lab-1/go.mod
 ADD go.sum /go/src/github.com/Alevsk/dvka/lab-1/go.sum
@@ -19,7 +19,7 @@ RUN go build -ldflags "-w -s" -a -o lab1 ./cmd/app
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
 
-MAINTAINER Lenin Alevski "lenin@alevsk.com"
+LABEL org.opencontainers.image.authors="lenin@alevsk.com"
 
 EXPOSE 8080
 

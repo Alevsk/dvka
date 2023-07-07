@@ -1,13 +1,15 @@
 package main
 
-import "github.com/dgrijalva/jwt-go"
-import "github.com/minio/pkg/env"
+import (
+	"github.com/dgrijalva/jwt-go"
+	"github.com/minio/pkg/env"
+)
 
-func GetSigningKEy() string {
+func getSigningKey() string {
 	return env.Get("DVKA_LAB1_SIGNING_KEY", "")
 }
 
-func GetFlag() string {
+func getFlag() string {
 	return env.Get("DVKA_LAB1_FLAG", "flag{}")
 }
 
@@ -29,7 +31,7 @@ var NFTList = []NFT{
 		ID:      0,
 		Name:    "Golden bored ape",
 		Price:   1000,
-		comment: GetFlag(),
+		comment: getFlag(),
 	},
 	{
 		ID:      1,

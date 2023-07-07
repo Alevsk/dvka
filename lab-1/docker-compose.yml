@@ -1,0 +1,16 @@
+version: "3"
+services:
+  dvka-labl-1: 
+      image: alevsk/dvka:lab-1
+      container_name: dvka-labl-1
+      restart: unless-stopped
+      environment:
+        - DVKA_LAB1_SIGNING_KEY=""
+        - DVKA_LAB1_FLAG=""
+      ports:
+        - 8080:8080
+      networks:
+        - internal
+networks:
+  internal:
+    driver: bridge
