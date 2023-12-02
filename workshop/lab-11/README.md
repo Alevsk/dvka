@@ -60,13 +60,15 @@
 9. Deploy ubuntu pod
 
     ```bash
+    # delete ubuntu pod
+    kubectl delete -f ubuntu.yaml
     # create ubuntu pod without mounting service account by default
     kubectl apply -f ubuntu-no-sa.yaml
     ```
 
 10. Try to navigate again to the `serviceaccount` folder (You should get an error)
 
-    - `kubectl exec -it ubuntu -- /bin/bash`
+    - `kubectl exec -it pod/ubuntu -- /bin/bash`
     - `cd /var/run/secrets/kubernetes.io/serviceaccount`
 
 11. Finalize the lab
