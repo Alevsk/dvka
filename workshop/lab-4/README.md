@@ -10,7 +10,7 @@
     # create service (nginx by default will run in port 80)
     kubectl create service clusterip nginx --tcp=8080:80
     # locally expose nginx service using port 8080
-    kubectl port-forward svc/nginx-service 8080:8080
+    kubectl port-forward svc/nginx 8080:8080
     ```
 
 2. Open browser and go to <http://localhost:8080/>
