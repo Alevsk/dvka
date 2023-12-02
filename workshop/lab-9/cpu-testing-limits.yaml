@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-testing
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: cpu-testing
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cpu-testing
+    spec:
+      containers:
+        - name: cpu-testing
+          image: vish/stress
+          args:
+            - -cpus
+            - "2"
+          resources:
+            limits:
+              cpu: "1"
+            requests:
+              cpu: "0.5"

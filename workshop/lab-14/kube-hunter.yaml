@@ -1,0 +1,17 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kube-hunter
+spec:
+  template:
+    metadata:
+      labels:
+        app: kube-hunter
+    spec:
+      containers:
+        - name: kube-hunter
+          image: docker.io/alevsk/kube-hunter:fix
+          command: ["kube-hunter"]
+          args: ["--pod"]
+      restartPolicy: Never

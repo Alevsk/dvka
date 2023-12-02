@@ -1,0 +1,9 @@
+---
+kind: NetworkPolicy
+apiVersion: projectcalico.org/v3
+metadata:
+  name: default-deny
+  namespace: tenant-2
+spec:
+  order: 20
+  selector: ""

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: encoding-service
+spec:
+  selector:
+    matchLabels:
+      app: encoding-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: encoding-service
+    spec:
+      containers:
+        - name: encoding-service
+          image: alevsk/dvka:lab7
+          ports:
+            - containerPort: 1337
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: encoding-service
+spec:
+  selector:
+    app: encoding-service
+  ports:
+    - protocol: TCP
+      port: 1337
+      targetPort: 1337

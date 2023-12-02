@@ -25,6 +25,7 @@ dist/
 # Ignore tls cert and key
 private.key
 public.crt
+*.pem
 
 # Ignore VsCode files
 .vscode/
@@ -32,6 +33,7 @@ public.crt
 *~
 .eslintcache
 
+# binaries
 lab1
 lab2
 lab3
@@ -42,3 +44,8 @@ lab7
 lab8
 lab9
 lab10
+encode
+server
+
+# solution docs
+SOLUTION.md

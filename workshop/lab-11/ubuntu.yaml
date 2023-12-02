@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ubuntu-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ubuntu-sa-role
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ubuntu-sa-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ubuntu-sa-role
+subjects:
+  - kind: ServiceAccount
+    name: ubuntu-sa
+    namespace: default
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  namespace: default
+spec:
+  serviceAccountName: ubuntu-sa
+  containers:
+    - image: ubuntu
+      command:
+        - sleep
+        - "3600"
+      imagePullPolicy: IfNotPresent
+      name: ubuntu
+  restartPolicy: Always

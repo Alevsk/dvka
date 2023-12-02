@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+        - name: server-configuration
+          configMap:
+            name: nginx-configuration-tls
+        - name: server-index
+          configMap:
+            name: nginx-index
+        - name: server-certificates
+          secret:
+            secretName: nginx-tls-certificates
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: server-configuration
+              mountPath: /etc/nginx/conf.d
+            - name: server-index
+              mountPath: /var/www/html
+            - name: server-certificates
+              mountPath: "/etc/ssl/nginx/"
+              readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443

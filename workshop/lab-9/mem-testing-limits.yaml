@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mem-testing
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: mem-testing
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mem-testing
+    spec:
+      containers:
+        - name: mem-testing
+          image: polinux/stress
+          command: ["stress"]
+          args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
+          resources:
+            requests:
+              memory: "100Mi"
+            limits:
+              memory: "200Mi"

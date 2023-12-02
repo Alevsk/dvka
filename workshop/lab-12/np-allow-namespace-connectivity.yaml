@@ -1,0 +1,18 @@
+---
+kind: NetworkPolicy
+apiVersion: projectcalico.org/v3
+metadata:
+  name: allow-namespace-connectivity
+  namespace: tenant-2
+spec:
+  order: 10
+  selector: ""
+  types:
+    - Ingress
+    - Egress
+  ingress:
+    - action: Allow
+      source:
+        namespaceSelector: kubernetes.io/metadata.name == 'tenant-2'
+  egress:
+    - action: Allow

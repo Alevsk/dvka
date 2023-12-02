@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kube-hunter-with-sa
+spec:
+  template:
+    metadata:
+      labels:
+        app: kube-hunter-with-sa
+    spec:
+      serviceAccountName: kube-hunter
+      containers:
+        - name: kube-hunter-with-sa
+          image: docker.io/alevsk/kube-hunter:fix
+          command: ["kube-hunter"]
+          args: ["--pod"]
+      restartPolicy: Never

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+        - name: server-configuration
+          configMap:
+            name: nginx-configuration
+        - name: server-index
+          configMap:
+            name: nginx-index
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: server-configuration
+              mountPath: /etc/nginx/conf.d
+            - name: server-index
+              mountPath: /var/www/html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
