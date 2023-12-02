@@ -18,7 +18,7 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 ### Beginner
 
 - [Create New Kubernetes Cluster Using Kind](./workshop/lab-1/README.md)
-- [Explore Kubectl Command](./workshop/lab-2/README.md)
+- [Explore ~/.kube/config File And Kubectl Command](./workshop/lab-2/README.md)
 - [Explore k9s To Manage Your Cluster](./workshop/lab-3/README.md)
 - [Deploy Kubernetes Workload](./workshop/lab-4/README.md)
 - [Get a Shell to a Running Container](./workshop/lab-5/README.md)
