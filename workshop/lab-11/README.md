@@ -14,7 +14,7 @@
     **kubectl:**
 
     ```bash
-    kubectl exec -it ubuntu -- /bin/bash
+    kubectl exec -it pod/ubuntu -- /bin/bash
     ```
 
     **k9s:**
