@@ -53,7 +53,7 @@
     export TOKEN=$(cat token)
     curl --cacert ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces?limit=500 -H "Authorization: Bearer $TOKEN"
     # Use jq to parse the list of existing namespaces in the cluster
-    curl --cacert ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces?limit=500 -H "Authorization: Bearer $TOKEN" | jq "items[].metadata.name"
+    curl --cacert ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces?limit=500 -H "Authorization: Bearer $TOKEN" | jq ".items[].metadata.name"
 
     ```
 
