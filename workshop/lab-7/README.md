@@ -29,7 +29,7 @@
     # forwarding tenant-1 in first terminal
     kubectl port-forward svc/nginx 8081:8080 -n tenant-1
     # forwarding tenant-2 in second terminal
-    kubectl port-forward svc/nginx 8082:8080 -n tenant-1
+    kubectl port-forward svc/nginx 8082:8080 -n tenant-2
     ```
 
     Open browser and go to <http://localhost:8081> and <http://localhost:8082> to verify applications are running correctly
