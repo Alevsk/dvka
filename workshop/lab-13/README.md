@@ -7,7 +7,7 @@ Checks whether Kubernetes is deployed according to security best practices as de
 1. Deploy `kube-bench` into your cluster do start the assessment.
 
     ```bash
-    kubectl apply -f https://raw.githubusercontent.com/aquasecurity/kube-bench/main/job.yaml
+    kubectl apply -f kube-bench.yaml
     ```
 
 2. Confirm `kube-bench` pod was created and status is `Completed`.
@@ -32,7 +32,7 @@ Checks whether Kubernetes is deployed according to security best practices as de
 
     ```bash
     # end the lab
-    kubectl delete -f https://raw.githubusercontent.com/aquasecurity/kube-bench/main/job.yaml
+    kubectl delete -f kube-bench.yaml
     ```
 
 ## Resouces
