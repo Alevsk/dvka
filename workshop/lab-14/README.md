@@ -25,7 +25,7 @@
     # list scanning capabilities
     kube-hunter --list
     # scan local k8s cluster running via kind
-    kube-hunter --remote localhost
+    kube-hunter --kubeconfig="~/.kube/config" --k8s-auto-discover-nodes
     ```
 
 3. Run `kube-hunter` scanner outside the cluster using a `service account`
@@ -36,7 +36,7 @@
     # export service account to environment variable
     export KHTOKEN=$(kubectl get secrets kube-hunter-secret -o json | jq ".data.token" -j | base64 -d)
     # run kube-hunter
-    kube-hunter --remote=localhost --service-account-token=$KHTOKEN
+    kube-hunter --kubeconfig="~/.kube/config" --k8s-auto-discover-nodes --service-account-token=$KHTOKEN
     ```
 
 4. Run `kube-hunter` scanner inside the cluster as pod
