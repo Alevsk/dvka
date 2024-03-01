@@ -1,4 +1,4 @@
-FROM golang:1.19
+FROM golang:1.21.5
 
 ADD go.mod /go/src/github.com/alevsk/server/go.mod
 ADD go.sum /go/src/github.com/alevsk/server/go.sum

@@ -11,13 +11,13 @@
 2. Build the `encoding service` docker image
 
     ```bash
-    docker build -t alevsk/dvka:lab7 -f encoding-service/Dockerfile ./encoding-service
+    docker build -t alevsk/dvka:lab10 -f encoding-service/Dockerfile ./encoding-service
     ```
 
 3. Push the image to your Kubernetes cluster
 
     ```bash
-    kind load docker-image alevsk/dvka:lab7 --name workshop-cluster
+    kind load docker-image alevsk/dvka:lab10 --name workshop-cluster
     ```
 
 4. Deploy the application into Kubernetes
@@ -44,9 +44,9 @@
 
     ```bash
     # build scratch image
-    docker build -t alevsk/dvka:lab7-scratch -f encoding-service/Dockerfile.scratch ./encoding-service
+    docker build -t alevsk/dvka:lab10-scratch -f encoding-service/Dockerfile.scratch ./encoding-service
     # push image to kubernetes
-    kind load docker-image alevsk/dvka:lab7-scratch --name workshop-cluster
+    kind load docker-image alevsk/dvka:lab10-scratch --name workshop-cluster
     # create deployment
     kubectl apply -f encoding-service-scratch.yaml
     # locally expose the application service
