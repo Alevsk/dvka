@@ -16,9 +16,13 @@
       apiServerPort: 6443
     nodes:
       - role: control-plane
+        image: kindest/node:v1.27.3
       - role: worker
+        image: kindest/node:v1.27.3
       - role: worker
+        image: kindest/node:v1.27.3
       - role: worker
+        image: kindest/node:v1.27.3
     ```
 
 2. Create the cluster
