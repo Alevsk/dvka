@@ -1,4 +1,4 @@
-FROM golang:1.19 as golayer
+FROM golang:1.21.5-bullseye as golayer
 
 RUN apt-get update && apt-get install -y ca-certificates
 
