@@ -42,13 +42,10 @@
 
 2. Look at lab-6-secret `secret` using `k9s` or `kubectl`
 
-3. Create new `secret` from a file
-
-    > Generate self-signed tls certificates using [mkcert](https://github.com/FiloSottile/mkcert), openssl or any other tool you want.<br>
-    > ie:<br>
-    > `mkcert localhost`
+3. Create new `secret` from a TLS certificate keypair
 
     ```bash
+    # Generate self-signed certificates using https://github.com/FiloSottile/mkcert, openssl or any other tool you want. ie: `mkcert localhost`
     kubectl create secret tls nginx-tls-certificates --cert=localhost.pem --key=localhost-key.pem
     ```
 
