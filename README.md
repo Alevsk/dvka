@@ -53,3 +53,18 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 - Container escape (Coming soon)
 - Container Runtime Exploit `CVE-2019-5736` (Coming soon)
 - Kubernetes misconfiguration (Coming soon)
+
+### Tools Used During The Workshop
+
+- [jq](https://jqlang.github.io/jq/)
+- [Docker](https://docs.docker.com/engine/install/)
+- [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- [Kustomize](https://kustomize.io/)
+- [k9s](https://k9scli.io/topics/install/)
+- [mkcert](https://github.com/FiloSottile/mkcert)
+- [kube-bench](https://raw.githubusercontent.com/aquasecurity/kube-bench/main/job.yaml)
+- [kube-hunter](https://github.com/aquasecurity/kube-hunter)
+- [kube-linter](https://github.com/stackrox/kube-linter/releases/download/v0.6.5/kube-linter-linux.tar.gz)
+- [terrascan](https://github.com/tenable/terrascan/releases/download/v1.18.3/terrascan_1.18.3_Linux_x86_64.tar.gz)
+- [kubeaudit](https://github.com/Shopify/kubeaudit/releases/download/v0.22.0/kubeaudit_0.22.0_linux_amd64.tar.gz)

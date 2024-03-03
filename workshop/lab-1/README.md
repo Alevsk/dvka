@@ -31,6 +31,22 @@
     kind create cluster --config workshop-cluster.yaml --name workshop-cluster
     ```
 
+> **OPTIONAL:** Steps for virtual machine
+
+The provided `virtual machine` comes with all the necessary tools pre installed and container images, once the `kind` cluster is up and running you can push the images into the cluster:
+
+```bash
+# push all images to you kind cluster
+for image in $(cat images.txt); do kind load docker-image $image --name workshop-cluster; done;
+```
+
+If you want to update your local registry with the latest images run:
+
+```bash
+# pull all images to your local registry
+for image in $(cat images.txt); do docker pull $image; done;
+```
+
 ## Resouces
 
 - <https://kind.sigs.k8s.io/docs/user/configuration/>
