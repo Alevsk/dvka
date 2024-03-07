@@ -2,11 +2,11 @@
 
 DVKA is a series of apps deployed on Kubernetes that are damn vulnerable.
 
-The content of this repository is devided in two sections.
+The content of this repository is divided into two sections.
 
 ## Challenges
 
-Practice your `Kubernetes` exploitation skills by solving these fun challenges.
+Practice your `Kubernetes` exploitation techniques by solving these fun challenges.
 
 - [Challenge 1 - Hack The NFT Museum](./challenge-1/README.md)
 - [Challenge 2 - Enterprise Grade Network Debugging Console](./challenge-2/README.md)
@@ -54,7 +54,17 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 - Container Runtime Exploit `CVE-2019-5736` (Coming soon)
 - Kubernetes misconfiguration (Coming soon)
 
-### Tools Used During The Workshop
+## Tools Used During The Workshop
+
+The provided **virtual machine** contains everything you need to go over the labs:
+
+[🚀 download link 🔗](https://drive.google.com/file/d/12IX4xGvfqgZLrtutimWqQdxpJRRzDPto/view)
+
+> 🔒 Credentials - **username:** kubernetes / **password:** security
+
+![virtual machine](./workshop/images/virtual-machine.jpeg)
+
+Alternatively, you can manually install the following tools:
 
 - [jq](https://jqlang.github.io/jq/)
 - [Docker](https://docs.docker.com/engine/install/)
