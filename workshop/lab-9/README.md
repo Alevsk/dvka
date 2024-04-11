@@ -57,7 +57,7 @@
     ```bash
     kubectl delete -f metrics-server.yaml
     kubectl delete -f mem-testing.yaml
-    kubectl apply -f cpu-testing.yaml
+    kubectl delete -f cpu-testing.yaml
     ```
 
 ## Resouces
