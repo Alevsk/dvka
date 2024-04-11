@@ -1,0 +1,18 @@
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: kubernetes-security-csr
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQnhqQ0NBV3dDQVFBd1dqRVZNQk1HQTFVRUNnd01jM2x6ZEdWdE9tNXZaR1Z6TVFzd0NRWURWUVFHRXdKVgpVekUwTURJR0ExVUVBd3dyYzNsemRHVnRPbTV2WkdVNmEzVmlaWEp1WlhSbGN5MXpaV04xY21sMGVTNWtaV1poCmRXeDBMbk4yWXpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpIZ0l0V0ordllWSXpBb1pnOXMKRmEwaU9VRDlvZWxmNWxrZXl0UWd6WVFxSUd6YWpTTkd1MERUOTIyTjl5MnQ3SENTbFphcElWckdLSzhYM0dOegowNE9nZ2E4d2dhd0dDU3FHU0liM0RRRUpEakdCbmpDQm16Q0JtQVlEVlIwUkJJR1FNSUdOZ2hOcmRXSmxjbTVsCmRHVnpMWE5sWTNWeWFYUjVnaHRyZFdKbGNtNWxkR1Z6TFhObFkzVnlhWFI1TG1SbFptRjFiSFNDSDJ0MVltVnkKYm1WMFpYTXRjMlZqZFhKcGRIa3VaR1ZtWVhWc2RDNXpkbU9DTFd0MVltVnlibVYwWlhNdGMyVmpkWEpwZEhrdQpaR1ZtWVhWc2RDNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJJSUpiRzlqWVd4b2IzTjBNQW9HQ0NxR1NNNDlCQU1DCkEwZ0FNRVVDSUhGNWp1MEF1REZrY0IycnNkTWFJK2lCZFpVTGVETlFHMm9tR21adVhFemhBaUVBa1JQNkJ5b2MKS0gwak9KSi8xdXRNUXNxOW5nSENRQTkrVnZ6N0Ivb29vSFU9Ci0tLS0tRU5EIENFUlRJRklDQVRFIFJFUVVFU1QtLS0tLQo=
+  signerName: kubernetes.io/kubelet-serving
+  expirationSeconds: 31556952 # 1 year
+  groups:
+    - system:serviceaccounts
+    - system:serviceaccounts:minio-operator
+    - system:authenticated
+    - system:nodes
+  usages:
+    - "digital signature"
+    - "key encipherment"
+    - "server auth"
+  username: system:serviceaccount:minio-operator:minio-operator

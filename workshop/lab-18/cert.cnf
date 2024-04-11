@@ -1,0 +1,19 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+prompt = no
+
+[req_distinguished_name]
+O = "system:nodes"
+C = US
+CN  = "system:node:kubernetes-security.default.svc"
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = kubernetes-security
+DNS.2 = kubernetes-security.default
+DNS.3 = kubernetes-security.default.svc
+DNS.4 = kubernetes-security.default.svc.cluster.local
+DNS.5 = localhost
