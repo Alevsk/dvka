@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: default-tls-certificate
+  namespace: default
+spec:
+  secretName: default-tls-certificate-secret
+  issuerRef:
+    name: custom-ca
+    kind: ClusterIssuer
+  commonName: "kubernetes-security"
+  dnsNames:
+    - "kubernetes-security.default"
+    - "kubernetes-security.default.svc"
+    - "kubernetes-security.default.svc.cluster.local"
+    - "localhost"

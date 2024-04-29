@@ -51,7 +51,7 @@ Alternatively, you can manually install the following tools on your system (Linu
 ### 👩‍💻 Intermediate
 
 - [Kubernetes certificate authority](./lab-18/README.md)
-- cert-manager: X.509 certificate management for Kubernetes (Coming soon)
+- [cert-manager: X.509 certificate management for Kubernetes](./lab-19/README.md)
 - [Pod Resource Limits](./lab-9/README.md)
 - [Scratch Containers](./lab-10/README.md)
 - Pod Security Policies (Coming soon)
