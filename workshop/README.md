@@ -71,7 +71,7 @@ Alternatively, you can manually install the following tools on your system (Linu
 - [kube-linter: Check Kubernetes YAML files and Helm charts](./lab-15/README.md)
 - [terrascan: Static code analyzer for Infrastructure as Code](./lab-16/README.md)
 - [kubeaudit: Audit your Kubernetes clusters against common security controls](./lab-17/README.md)
-- Deploy privileged container, A Container That Doesn't Contain Anything (Coming soon)
+- [Deploy privileged container, A Container That Doesn't Contain Anything](./lab-20/README.md)
 - Container escape (Coming soon)
 - Container Runtime Exploit `CVE-2019-5736` (Coming soon)
 - Kubernetes misconfiguration (Coming soon)
