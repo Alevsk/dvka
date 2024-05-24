@@ -12,3 +12,11 @@ Practice your `Kubernetes` exploitation techniques by solving these fun challeng
 ## 🛠️ Workshop
 
 Learn everything you need to know to become proficient in `Kubernetes` security by completing the [Kubernetes Security Workshop: Hands-On Attack and Defense](./workshop/README.md) lab series.
+
+## External Resources
+
+Additional resources to learn `Kubernetes Security` that I recommend.
+
+- [Kubernetes LAN Party](https://www.k8slanparty.com/)
+- [Kubernetes Goat](https://github.com/madhuakula/kubernetes-goat)
+- [OWASP Kubernetes Top Ten](https://owasp.org/www-project-kubernetes-top-ten/)
