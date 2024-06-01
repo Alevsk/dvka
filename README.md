@@ -17,7 +17,9 @@ Learn everything you need to know to become proficient in `Kubernetes` security 
 
 Additional resources to learn `Kubernetes Security` that I recommend.
 
-- [Kubernetes LAN Party](https://www.k8slanparty.com/)
+- [Cloudnative - Hacking kubernetes](https://github.com/cloudnative-security/hacking-kubernetes)
+- [HackTricks - Kubernetes Security](https://cloud.hacktricks.xyz/pentesting-cloud/kubernetes-security)
+- [KubeCon NA 2019 CTF](https://securekubernetes.com/)
 - [Kubernetes Goat](https://github.com/madhuakula/kubernetes-goat)
+- [Kubernetes LAN Party](https://www.k8slanparty.com/)
 - [OWASP Kubernetes Top Ten](https://owasp.org/www-project-kubernetes-top-ten/)
-- [hacking-kubernetes](https://github.com/cloudnative-security/hacking-kubernetes)
