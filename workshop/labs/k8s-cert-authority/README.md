@@ -64,7 +64,7 @@
    cat public.crt | openssl x509 -noout -text
    ```
 
-10. Use this keypair to configure TLS for your workloads, similar to what you did for [Lab 6: Configmaps & Secrets](../lab-6/README.md)
+10. Use this keypair to configure TLS for your workloads, similar to what you did for the [Configmaps & Secrets](../configmaps-secrets/README.md) lab
 
 ## Resouces
 

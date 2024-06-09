@@ -60,7 +60,7 @@
 
    You can use <https://www.sslshopper.com/certificate-decoder.html> or <https://www.sslchecker.com/certdecoder> to verify the content of the certificate
 
-8. Use this keypair to configure TLS for your workloads, similar to what you did for [Lab 6: Configmaps & Secrets](../lab-6/README.md)
+8. Use this keypair to configure TLS for your workloads, similar to what you did for the [Configmaps & Secrets](../configmaps-secrets/README.md) lab
 
 9. End the lab
 
