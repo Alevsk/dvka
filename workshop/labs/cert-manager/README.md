@@ -72,7 +72,7 @@
    kubectl delete -f cert-manager.yaml
    ```
 
-## Resouces
+## Resources
 
 - <https://cert-manager.io/docs/installation/>
 - <https://cert-manager.io/docs/tutorials/acme/nginx-ingress/>

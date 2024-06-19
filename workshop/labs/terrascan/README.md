@@ -68,6 +68,6 @@ Detect compliance and security violations across Infrastructure as Code to mitig
     docker run --rm -v $(pwd)/minio:/workspace --workdir /workspace tenable/terrascan scan -i k8s -f /workspace/minio-standalone-deployment.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://github.com/tenable/terrascan>

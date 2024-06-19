@@ -83,7 +83,7 @@ kubectl delete secret lab-6-secret
 kubectl delete secret nginx-tls-certificates
 ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/concepts/configuration/configmap/>
 - <https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/>

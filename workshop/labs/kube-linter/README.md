@@ -57,7 +57,7 @@ KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm 
     kube-linter lint wordpress-helm-chart/
     ```
 
-## Resouces
+## Resources
 
 - <https://github.com/stackrox/kube-linter>
 - <https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/>

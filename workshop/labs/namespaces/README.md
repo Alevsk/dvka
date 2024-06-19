@@ -77,6 +77,6 @@
     kubectl delete -f tenant-2.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/>

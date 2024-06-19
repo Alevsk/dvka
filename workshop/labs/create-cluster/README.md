@@ -47,6 +47,6 @@ If you want to update your local registry with the latest images run:
 for image in $(cat images.txt); do docker pull $image; done;
 ```
 
-## Resouces
+## Resources
 
 - <https://kind.sigs.k8s.io/docs/user/configuration/>

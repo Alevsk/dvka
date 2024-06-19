@@ -56,6 +56,6 @@
     docker stop $CONTAINER_ID
     ```
 
-## Resouces
+## Resources
 
 - <https://kind.sigs.k8s.io/docs/user/configuration/>
