@@ -119,6 +119,6 @@
     kubectl delete secret mysql-pass
     ```
 
-## Resouces
+## Resources
 
 - <https://github.com/Shopify/kubeaudit>

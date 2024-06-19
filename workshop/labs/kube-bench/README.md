@@ -35,7 +35,7 @@ Checks whether Kubernetes is deployed according to security best practices as de
     kubectl delete -f kube-bench.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://github.com/aquasecurity/kube-bench>
 - <https://www.cisecurity.org/benchmark/kubernetes>

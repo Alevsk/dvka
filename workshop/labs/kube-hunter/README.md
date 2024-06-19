@@ -66,6 +66,6 @@
     kubectl delete -f kube-hunter-sa.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://github.com/aquasecurity/kube-hunter>

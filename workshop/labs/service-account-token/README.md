@@ -79,6 +79,6 @@
     kubectl delete -f ubuntu.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>

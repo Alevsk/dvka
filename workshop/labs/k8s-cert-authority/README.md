@@ -66,6 +66,6 @@
 
 10. Use this keypair to configure TLS for your workloads, similar to what you did for the [Configmaps & Secrets](../configmaps-secrets/README.md) lab
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/>
