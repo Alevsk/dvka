@@ -10,6 +10,8 @@ The provided **virtual machine** contains everything you need to go over the lab
 
 1. Download the `Kubernetes Security Workshop` image using the following [link 🔗](https://drive.google.com/file/d/12IX4xGvfqgZLrtutimWqQdxpJRRzDPto/view) (size: 26.5G).
 
+   > *If you see a rate-limit message make sure you are logged in with your google/gmail account before trying to download the file*
+
 1. Run VirtualBox / Vmware Player and import the virtual machine image (virtual machine size: 100G once imported).
 
 1. Login into the virtual machine.
