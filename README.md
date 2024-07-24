@@ -23,3 +23,4 @@ Additional resources to learn `Kubernetes Security` that I recommend.
 - [Kubernetes Goat](https://github.com/madhuakula/kubernetes-goat)
 - [Kubernetes LAN Party](https://www.k8slanparty.com/)
 - [OWASP Kubernetes Top Ten](https://owasp.org/www-project-kubernetes-top-ten/)
+- [Threat Matrix for Kubernetes](https://microsoft.github.io/Threat-Matrix-for-Kubernetes/)
