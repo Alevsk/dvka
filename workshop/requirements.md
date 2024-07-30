@@ -46,6 +46,34 @@ nuclei installed .... ✅
 apt autoremove completed .... ✅
 ```
 
+## Container Images
+
+The `images.txt` file has a list of all the container images used during this workshop. To save time, download all of them and save them into your local registry.
+
+```bash
+# pull all images to your local registry
+for image in $(cat images.txt); do docker pull $image; done;
+```
+
+### (OPTIONAL) Load container images from a backup file
+
+Use the `workshop-images.sh` script to load all the container images from a provided backup file. Download the `docker_images.zip` file using the following [link 🔗 (size: 2.1G)](https://drive.google.com/file/d/1wM9sW-AdZibeGnR4058uCXQZwmguoQd_/view).
+
+> *If you see a rate-limit message make sure you are logged in with your google/gmail account before trying to download the file*
+
+```bash
+chmod +x workshop-images.sh
+./workshop-images.sh load --file docker_images.zip
+```
+
+### Verify Images
+
+Verify all the images are in your local registry
+
+```bash
+docker images
+```
+
 ## Virtual Machine
 
 Alternatively, the following **virtual machine** image contains everything you need to go over the labs:
