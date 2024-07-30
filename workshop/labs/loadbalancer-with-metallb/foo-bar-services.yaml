@@ -1,0 +1,108 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: foo-app
+  labels:
+    app: foo
+    svc: foo-bar
+spec:
+  containers:
+    - name: foo-app
+      image: nginx:1.22.0
+      volumeMounts:
+        - name: config
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+  volumes:
+    - name: config
+      configMap:
+        name: foo-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foo-config
+data:
+  index.html: |
+    <h1>foo</h1>
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: foo-service
+spec:
+  selector:
+    app: foo
+  ports:
+    - port: 80
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: bar-app
+  labels:
+    app: bar
+    svc: foo-bar
+spec:
+  containers:
+    - name: bar-app
+      image: nginx:1.22.0
+      volumeMounts:
+        - name: config
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+  volumes:
+    - name: config
+      configMap:
+        name: bar-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bar-config
+data:
+  index.html: |
+    <h1>bar</h1>
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bar-service
+spec:
+  selector:
+    app: bar
+  ports:
+    - port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: foo-bar
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: "/foo(/|$)(.*)"
+            backend:
+              service:
+                name: foo-service
+                port:
+                  number: 80
+          - pathType: ImplementationSpecific
+            path: "/bar(/|$)(.*)"
+            backend:
+              service:
+                name: bar-service
+                port:
+                  number: 80
+          # - pathType: Prefix
+          #   path: "/foo-bar(/|$)(.*)"
+          #   backend:
+          #     service:
+          #       name: foo-bar-service
+          #       port:
+          #         number: 80

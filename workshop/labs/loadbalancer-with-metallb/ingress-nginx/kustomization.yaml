@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ingress-nginx
+
+resources:
+  - controller-service.yaml
+  - controller-service-webhook.yaml
+  - controller-serviceaccount.yaml
+  - controller-role.yaml
+  - controller-rolebinding.yaml
+  - controller-ingressclass.yaml
+  - controller-deployment.yaml
+  - controller-configmap.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - admission-webhooks/validating-webhook.yaml
+  - admission-webhooks/job-patch/serviceaccount.yaml
+  - admission-webhooks/job-patch/role.yaml
+  - admission-webhooks/job-patch/rolebinding.yaml
+  - admission-webhooks/job-patch/job-patchWebhook.yaml
+  - admission-webhooks/job-patch/job-createSecret.yaml
+  - admission-webhooks/job-patch/clusterrole.yaml
+  - admission-webhooks/job-patch/clusterrolebinding.yaml
+  - namespace.yaml
