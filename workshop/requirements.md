@@ -48,7 +48,7 @@ apt autoremove completed .... ✅
 
 ## Container Images
 
-The `images.txt` file has a list of all the container images used during this workshop. To save time, download all of them and save them into your local registry.
+The [images.txt](./images.txt) file has a list of all the container images used during this workshop. To save time, download all of them and save them into your local registry.
 
 ```bash
 # pull all images to your local registry
