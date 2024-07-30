@@ -51,7 +51,7 @@ KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm 
     kube-linter lint wordpress/*.yaml --format json | jq -r '[.Reports[] | { "Check": .Check, "Service": .Object.K8sObject.Name, "Type": .Object.K8sObject.GroupVersionKind.Kind, "Message": .Diagnostic.Message, "Remediation": .Remediation }]'
     ```
 
-4. USe `kube-linter` to scan for vulnerabilities in the wordpress `helm` application
+4. Use `kube-linter` to scan for vulnerabilities in the wordpress `helm` application
 
     ```bash
     kube-linter lint wordpress-helm-chart/
