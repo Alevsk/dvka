@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tenant-1
+  labels:
+    environment: development
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: tenant-1
+data:
+  default.conf: |
+    server {
+        listen 0.0.0.0:8080;
+        server_name localhost;
+        index index.html index.htm;
+
+        error_log  /var/log/nginx/error.log;
+        access_log /var/log/nginx/access.log;
+        
+        root /var/www/html/;
+
+        charset utf-8;
+
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-Content-Type-Options "nosniff";
+        server_tokens off;
+        
+        location / {
+            index index.html;
+        }
+    }
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Kubernetes Security Workshop</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f0f0f0;
+                font-family: 'Lato', sans-serif;
+            }
+
+            h1 {
+                font-size: 50px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tenant One</h1>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: tenant-1
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+        - name: server-configuration
+          configMap:
+            name: nginx-configuration
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: server-configuration
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+            - name: server-configuration
+              mountPath: /var/www/html/index.html
+              subPath: index.html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: tenant-1
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

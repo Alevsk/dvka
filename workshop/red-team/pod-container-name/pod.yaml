@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coredns-7db6d8ff4d-8adtw
+  namespace: kube-system
+  labels:
+    k8s-app: kube-dns
+spec:
+  containers:
+    - image: busybox
+      command:
+        - sleep
+        - "3600"
+      imagePullPolicy: IfNotPresent
+      name: coredns
+  restartPolicy: Always
