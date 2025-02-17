@@ -33,6 +33,6 @@
     kubectl delete -f busybox.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/>

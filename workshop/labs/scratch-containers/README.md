@@ -68,7 +68,7 @@
 
     * Differences between regular images and scratch images
 
-## Resouces
+## Resources
 
 * <https://github.com/GoogleContainerTools/distroless>
 * <https://hub.docker.com/_/scratch>

@@ -102,7 +102,7 @@ Use "kubectl options" for a list of global command-line options (applies to all 
 
 ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/tools/#kubectl>
 - <https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/>

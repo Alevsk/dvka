@@ -31,7 +31,7 @@ Attackers who have permissions, can run malicious commands in containers in the 
     kubectl delete -f nginx.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/>
 - <https://kubernetes-threat-matrix.redguard.ch/execution/bash-cmd-in-container/>

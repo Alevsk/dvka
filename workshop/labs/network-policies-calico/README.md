@@ -162,7 +162,7 @@
     kubectl delete -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://docs.tigera.io/calico/latest/network-policy/get-started/kubernetes-policy/kubernetes-policy-basic#enable-isolation>
 - <https://docs.tigera.io/calico/latest/reference/resources/networkpolicy>

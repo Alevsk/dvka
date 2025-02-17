@@ -13,6 +13,6 @@ Attackers who have permissions to run a cmd/bash script inside a container can u
     kubectl run nginx --restart=Never -ti --rm --image nginx -- bash
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/>

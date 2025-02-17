@@ -49,6 +49,6 @@
     kubectl delete -f nginx.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/>

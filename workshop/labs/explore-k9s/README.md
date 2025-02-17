@@ -8,6 +8,6 @@
 
 ![k9s ui](../images/k9s.png)
 
-## Resouces
+## Resources
 
 - <https://k9scli.io/topics/video/>

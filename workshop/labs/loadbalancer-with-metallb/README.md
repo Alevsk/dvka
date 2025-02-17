@@ -61,7 +61,7 @@
     kubectl delete -f metallb-native.yaml -n metallb-system
     ```
 
-## Resouces
+## Resources
 
 - <https://metallb.io/>
 - <https://medium.com/groupon-eng/loadbalancer-services-using-kubernetes-in-docker-kind-694b4207575d>

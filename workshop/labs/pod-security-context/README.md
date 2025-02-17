@@ -45,7 +45,7 @@
     kubectl delete -f ubuntu-with-security-context.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/configure-pod-container/security-context/>
 - <https://kubernetes.io/docs/concepts/security/pod-security-standards/>

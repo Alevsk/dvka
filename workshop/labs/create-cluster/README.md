@@ -23,6 +23,6 @@ If using `kind`, once your kubernetes `workshop-cluster` is up and running you c
 for image in $(cat ../../images.txt); do kind load docker-image $image --name workshop-cluster; done;
 ```
 
-## Resouces
+## Resources
 
 - <https://kind.sigs.k8s.io/docs/user/configuration/>

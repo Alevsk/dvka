@@ -78,13 +78,13 @@ docker images
 
 Alternatively, the following **virtual machine** image contains everything you need to go over the labs:
 
-1. Install the right version of [Oracle VM VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [VMware Workstation Player](https://www.vmware.com/content/vmware/vmware-published-sites/us/products/workstation-player/workstation-player-evaluation.html.html) for your system.
+1. Install the right version of [Oracle VM VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [VMware Workstation Player](https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html) for your system.
 
 1. Download the `Kubernetes Security Workshop` image using the following [link 🔗](https://drive.google.com/file/d/12IX4xGvfqgZLrtutimWqQdxpJRRzDPto/view) (size: 26.5G).
 
    > *If you see a rate-limit message make sure you are logged in with your google/gmail account before trying to download the file*
 
-1. Run VirtualBox / Vmware Player and import the virtual machine image (virtual machine size: 100G once imported).
+1. Run VirtualBox / VMware Player and import the virtual machine image (virtual machine size: 100G once imported).
 
 1. Login into the virtual machine.
 

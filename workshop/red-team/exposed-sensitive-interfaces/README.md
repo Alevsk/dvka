@@ -43,7 +43,7 @@ In addition, having such services exposed within the cluster network without str
     kubectl delete -f kubernetes-dashboard.yaml
     ```
 
-## Resouces
+## Resources
 
 - <https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
 - <https://medium.com/@tejaswi.goudru/disable-authentication-https-in-kubernetes-dashboard-2fada478ce91>
