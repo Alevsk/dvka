@@ -53,9 +53,13 @@ The [images.txt](./images.txt) file has a list of all the container images used 
 ```bash
 # pull all images to your local registry
 for image in $(cat images.txt); do docker pull $image; done;
+# After pulling all the images and creating your kubernetes cluster using kind, you can load the images into the cluster using the following command:
+for image in $(cat images.txt); do kind load docker-image $image --name workshop-cluster; done;
 ```
 
 ### (OPTIONAL) Load container images from a backup file
+
+> You don't have to do this step if you already pulled and loaded the images into your kind cluster.
 
 Use the `workshop-images.sh` script to load all the container images from a provided backup file. Download the `docker_images.zip` file using the following [link 🔗 (size: 2.1G)](https://drive.google.com/file/d/1wM9sW-AdZibeGnR4058uCXQZwmguoQd_/view).
 

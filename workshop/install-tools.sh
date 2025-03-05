@@ -165,7 +165,7 @@ install_docker() {
 install_kind() {
   log_info "Installing Kind"
   if ! command -v kind &> /dev/null; then
-    run_cmd "curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64"
+    run_cmd "curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64"
     run_cmd "chmod +x /usr/local/bin/kind"
   fi
   log_done "Kind installed"
@@ -185,7 +185,7 @@ install_kubectl() {
 install_kustomize() {
   log_info "Installing Kustomize"
   if ! command -v kustomize &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.2/kustomize_v5.4.2_linux_amd64.tar.gz"
+    run_cmd "curl -Lo $WORKSHOP_DIR/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.6.0/kustomize_v5.6.0_linux_amd64.tar.gz"
     run_cmd "tar -zxvf $WORKSHOP_DIR/kustomize.tar.gz -C $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/kustomize /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/kustomize"
@@ -198,7 +198,7 @@ install_kustomize() {
 install_k9s() {
   log_info "Installing k9s"
   if ! command -v k9s &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/k9s.tar.gz https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz"
+    run_cmd "curl -Lo $WORKSHOP_DIR/k9s.tar.gz https://github.com/derailed/k9s/releases/download/v0.40.5/k9s_Linux_amd64.tar.gz"
     run_cmd "tar -zxvf $WORKSHOP_DIR/k9s.tar.gz -C $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/k9s /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/k9s"
@@ -232,7 +232,7 @@ install_kube_hunter() {
 install_kube_linter() {
   log_info "Installing kube-linter"
   if ! command -v kube-linter &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/v0.6.8/kube-linter-linux.tar.gz"
+    run_cmd "curl -Lo $WORKSHOP_DIR/kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/v0.7.2/kube-linter-linux.tar.gz"
     run_cmd "tar -zxvf $WORKSHOP_DIR/kube-linter.tar.gz -C $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/kube-linter /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/kube-linter"
@@ -245,7 +245,7 @@ install_kube_linter() {
 install_terrascan() {
   log_info "Installing terrascan"
   if ! command -v terrascan &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/terrascan.tar.gz https://github.com/tenable/terrascan/releases/download/v1.19.1/terrascan_1.19.1_Linux_x86_64.tar.gz"
+    run_cmd "curl -Lo $WORKSHOP_DIR/terrascan.tar.gz https://github.com/tenable/terrascan/releases/download/v1.19.9/terrascan_1.19.9_Linux_x86_64.tar.gz"
     run_cmd "tar -zxvf $WORKSHOP_DIR/terrascan.tar.gz -C $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/terrascan /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/terrascan"
@@ -258,7 +258,7 @@ install_terrascan() {
 install_kubeaudit() {
   log_info "Installing kubeaudit"
   if ! command -v kubeaudit &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/kubeaudit.tar.gz https://github.com/Shopify/kubeaudit/releases/download/v0.22.1/kubeaudit_0.22.1_linux_amd64.tar.gz"
+    run_cmd "curl -Lo $WORKSHOP_DIR/kubeaudit.tar.gz https://github.com/Shopify/kubeaudit/releases/download/v0.22.2/kubeaudit_0.22.2_linux_amd64.tar.gz"
     run_cmd "tar -zxvf $WORKSHOP_DIR/kubeaudit.tar.gz -C $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/kubeaudit /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/kubeaudit"
@@ -271,11 +271,11 @@ install_kubeaudit() {
 install_nuclei() {
   log_info "Installing nuclei"
   if ! command -v nuclei &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/nuclei_3.2.9_linux_amd64.zip https://github.com/projectdiscovery/nuclei/releases/download/v3.2.9/nuclei_3.2.9_linux_amd64.zip"
-    run_cmd "unzip $WORKSHOP_DIR/nuclei_3.2.9_linux_amd64.zip -d $WORKSHOP_DIR"
+    run_cmd "curl -Lo $WORKSHOP_DIR/nuclei_3.3.9_linux_amd64.zip https://github.com/projectdiscovery/nuclei/releases/download/v3.3.9/nuclei_3.3.9_linux_amd64.zip"
+    run_cmd "unzip $WORKSHOP_DIR/nuclei_3.3.9_linux_amd64.zip -d $WORKSHOP_DIR"
     run_cmd "mv $WORKSHOP_DIR/nuclei /usr/local/bin/"
     run_cmd "chmod +x /usr/local/bin/nuclei"
-    run_cmd "rm $WORKSHOP_DIR/nuclei_3.2.9_linux_amd64.zip $WORKSHOP_DIR/README_CN.md $WORKSHOP_DIR/README_ID.md $WORKSHOP_DIR/README_KR.md $WORKSHOP_DIR/LICENSE.md $WORKSHOP_DIR/README_ES.md $WORKSHOP_DIR/README_JP.md $WORKSHOP_DIR/README.md"
+    run_cmd "rm $WORKSHOP_DIR/nuclei_3.3.9_linux_amd64.zip $WORKSHOP_DIR/README_CN.md $WORKSHOP_DIR/README_ID.md $WORKSHOP_DIR/README_KR.md $WORKSHOP_DIR/LICENSE.md $WORKSHOP_DIR/README_ES.md $WORKSHOP_DIR/README_JP.md $WORKSHOP_DIR/README.md"
   fi
   log_done "nuclei installed"
 }
