@@ -232,12 +232,17 @@ func apiV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func robots(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/robots.txt")
+}
+
 func main() {
 	r := mux.NewRouter()
 	r.UseEncodedPath()
 	r.PathPrefix("/assets").HandlerFunc(assets)
 	r.PathPrefix("/api/v1").HandlerFunc(apiV1)
 	r.HandleFunc("/", app)
+	r.HandleFunc("/robots.txt", robots)
 	addr := "0.0.0.0:8080"
 	fmt.Printf("Starting server at %s\n", addr)
 	srv := &http.Server{

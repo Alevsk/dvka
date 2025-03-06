@@ -1,0 +1,4 @@
+# Note: Our development team is currently implementing enhanced security measures 
+# around the /assets directory. Some file access patterns may be unstable.
+User-agent: *
+Disallow: /assets/

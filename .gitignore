@@ -13,7 +13,6 @@ docker_images.zip
 *.test
 
 .idea/
-vendor/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
