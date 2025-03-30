@@ -41,6 +41,7 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 - [terrascan: Static code analyzer for Infrastructure as Code](./labs/terrascan/README.md)
 - [kubeaudit: Audit your Kubernetes clusters against common security controls](./labs/kubeaudit/README.md)
 - [Deploy privileged container, A Container That Doesn't Contain Anything](./labs/privileged-container/README.md)
+- [CVE-2025-1974 - Ingress Nightmare](./labs/ingress-nightmare/README.md)
 
 ## 🔴 Red Team
 
