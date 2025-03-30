@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
   lsb-release \
   software-properties-common \
   curl \
+  bsdmainutils \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Kind (Kubernetes in Docker)
@@ -92,3 +93,9 @@ RUN curl -Lo nuclei_3.3.9_linux_amd64.zip https://github.com/projectdiscovery/nu
   chmod +x /usr/local/bin/nuclei && \
   rm nuclei_3.3.9_linux_amd64.zip
 
+# Install kube-review (Kubernetes policy review tool)
+RUN curl -Lo kube-review.zip https://github.com/anderseknert/kube-review/releases/download/v0.4.0/kube-review-linux-amd64.zip && \
+  unzip -o kube-review.zip && \
+  mv kube-review-linux-amd64 /usr/local/bin/kube-review && \
+  chmod +x /usr/local/bin/kube-review && \
+  rm kube-review.zip
