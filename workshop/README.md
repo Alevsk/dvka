@@ -4,7 +4,8 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 
 ## Slides
 
-- [Kubernetes Security: Attacking And Defending Modern Infrastructure](./resources/Kubernetes%20Security_%20Attacking%20And%20Defending%20Modern%20Infrastructure.pdf)
+- Talk - [Kubernetes Security: Attacking And Defending Modern Infrastructure](./resources/Kubernetes%20Security_%20Attacking%20And%20Defending%20Modern%20Infrastructure.pdf)
+- Workshop - [Kubernetes Security: Hands-On Attack and Defense](https://docs.google.com/presentation/d/1algz44C9d2YFCHO3epScPzaEChJqBY2JijIjTtBnt7c/)
 
 ## Requirements
 

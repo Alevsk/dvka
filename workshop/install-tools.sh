@@ -224,7 +224,9 @@ install_mkcert() {
 install_kube_hunter() {
   log_info "Installing kube-hunter"
   if ! command -v kube-hunter &> /dev/null; then
-    run_cmd "pip install kube-hunter"
+    run_cmd "curl -Lo $WORKSHOP_DIR/kube-hunter https://github.com/aquasecurity/kube-hunter/releases/download/v0.6.8/kube-hunter-linux-x86_64-refs.tags.v0.6.8"
+    run_cmd "mv $WORKSHOP_DIR/kube-hunter /usr/local/bin/"
+    run_cmd "chmod +x /usr/local/bin/kube-hunter"
   fi
   log_done "kube-hunter installed"
 }
