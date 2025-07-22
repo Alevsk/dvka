@@ -212,7 +212,7 @@ install_k9s() {
 install_mkcert() {
   log_info "Installing mkcert"
   if ! command -v mkcert &> /dev/null; then
-    run_cmd "curl -Lo $WORKSHOP_DIR/mkcert https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+    run_cmd "curl -Lo $WORKSHOP_DIR/mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64"
     run_cmd "chmod +x $WORKSHOP_DIR/mkcert"
     run_cmd "mv $WORKSHOP_DIR/mkcert /usr/local/bin/"
     run_cmd "mkcert -install"
