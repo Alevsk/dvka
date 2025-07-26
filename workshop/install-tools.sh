@@ -156,7 +156,7 @@ install_docker() {
   # Create docker group and add user to it
   if ! getent group docker > /dev/null; then
     run_cmd "groupadd docker"
-    run_cmd "usermod -aG docker $USER"
+    run_cmd "usermod -aG docker $(logname)"
     run_cmd "newgrp docker"
   fi
   log_done "Docker installed"
