@@ -4,41 +4,44 @@ set -e
 set -o pipefail
 
 TOOLS_DIR="/usr/local/bin"
-MKCERT_DIR="$HOME/.local/share/mkcert"
 WORKSHOP_DIR="/tmp/workshop"
-USER=$(logname)
 DEBUG=0
 INSTALL_TOOLS=()
 INSTALL=0
+DOCKER_INSTALLED_FLAG=0 # Flag to track if Docker was installed
 
 # Ensure we are running as root
 if [[ $EUID -ne 0 ]]; then
-  printf "This script must be run as root. Use sudo.\n" >&2
+  printf "This script must be run as root. Use 'sudo ./install-tools.sh'.\n" >&2
   exit 1
+fi
+
+# Use SUDO_USER to reliably get the user who invoked sudo. Fallback if not set.
+USER_TO_ADD_TO_DOCKER=""
+if [[ -n "$SUDO_USER" ]]; then
+    USER_TO_ADD_TO_DOCKER="$SUDO_USER"
+else
+    # This is a fallback. The script is best used with a direct 'sudo' call.
+    printf "Warning: Could not determine the user who ran sudo via $SUDO_USER.\n" >&2
+    printf "You may need to manually add your user to the 'docker' group with: sudo usermod -aG docker $USER\n" >&2
+    # Setting a placeholder to avoid errors, but it won't be used effectively.
+    USER_TO_ADD_TO_DOCKER="ubuntu"
 fi
 
 # Function to display help menu
 show_help() {
   cat << EOF
-Usage: ${0##*/} [--debug] [--install TOOL1,TOOL2,...] [--help]
+Usage: ${0##*/} [--debug] [--install [TOOL1,TOOL2,...]] [--help]
 
 Options:
-  --debug                Enable debug mode
-  --install TOOL1,TOOL2  Install the specified tools (comma-separated list)
-  --help                 Display this help menu
+  --debug                Enable debug mode.
+  --install [TOOLS]      Install tools. If no tools are specified, all are installed.
+                         Provide a comma-separated list for specific tools.
+                         e.g., --install docker,kubectl,k9s
+  --help                 Display this help menu.
 
 Available tools:
-  docker
-  kind
-  kubectl
-  kustomize
-  k9s
-  mkcert
-  kube_hunter
-  kube_linter
-  terrascan
-  kubeaudit
-  nuclei
+  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei
 EOF
 }
 
@@ -113,6 +116,9 @@ install_prerequisites() {
 # Function to install Docker
 install_docker() {
   log_info "Installing Docker"
+  # Set the flag indicating we've run the docker installation
+  DOCKER_INSTALLED_FLAG=1
+
   # Uninstall previous conflicting packages
   for pkg in docker.io containerd runc; do
     run_cmd "apt-get remove -y $pkg"
@@ -153,11 +159,17 @@ install_docker() {
     run_cmd "systemctl start docker"
     run_cmd "systemctl enable docker"
   fi
-  # Create docker group and add user to it
+
+  # Create docker group if it doesn't exist.
   if ! getent group docker > /dev/null; then
     run_cmd "groupadd docker"
-    run_cmd "usermod -aG docker $(logname)"
-    run_cmd "newgrp docker"
+  fi
+  
+  # Add the original user to the docker group.
+  # This correctly modifies /etc/group but does NOT affect the user's current shell session.
+  if [[ "$USER_TO_ADD_TO_DOCKER" != "ubuntu" ]]; then
+    log_info "Adding user '$USER_TO_ADD_TO_DOCKER' to the docker group"
+    run_cmd "usermod -aG docker $USER_TO_ADD_TO_DOCKER"
   fi
   log_done "Docker installed"
 }
@@ -323,14 +335,17 @@ install_selected_tools() {
 
 # Function to perform cleanup
 cleanup() {
+  log_info "Cleaning up temporary files"
+  run_cmd "rm -rf $WORKSHOP_DIR"
+  log_done "Cleanup complete"
   log_info "Running apt autoremove"
   run_cmd "apt autoremove -y"
   log_done "apt autoremove completed"
 }
 
-# Main function to install all tools
+# Main function
 main() {
-  # Show help if no arguments are provided
+  # Show help if --install flag is not provided
   if [[ $INSTALL -eq 0 ]]; then
     show_help
     exit 0
@@ -346,6 +361,22 @@ main() {
   fi
 
   cleanup
+
+  # --- FINAL INSTRUCTIONS FOR USER ---
+  printf "\n\n✅ All selected tools have been installed successfully.\n"
+  
+  # If Docker was installed, show the crucial final message.
+  if [[ $DOCKER_INSTALLED_FLAG -eq 1 ]]; then
+      printf "\n********************************* IMPORTANT *********************************\n"
+      printf "The user '%s' has been added to the 'docker' group.\n" "$USER_TO_ADD_TO_DOCKER"
+      printf "For this change to take effect, you must do ONE of the following:\n\n"
+      printf "  1. Log out and log back in completely.\n"
+      printf "     OR\n"
+      printf "  2. For your CURRENT terminal session, run the command: newgrp docker\n"
+      printf "\nThis will start a new shell with the correct permissions to run docker commands without sudo.\n"
+      printf "*****************************************************************************\n"
+  fi
 }
 
+# Run the main function with all provided script arguments
 main "$@"
