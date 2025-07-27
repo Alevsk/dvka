@@ -25,7 +25,6 @@ I'm experimenting with [labs.iximiuz.com](https://labs.iximiuz.com/) to host the
 
 1. Sign up for [labs.iximiuz.com](https://labs.iximiuz.com/).
 2. Join the workshop at <https://labs.iximiuz.com/trainings/kubernetes-security-workshop-hands-on-attack-and-defense-e925c0d3>.
-3. Access the playground at <https://labs.iximiuz.com/playgrounds/kubernetes-security-workshop-d190f5e6>.
 
 ## Install Script
 
@@ -89,7 +88,7 @@ Verify all the images are in your local registry
 docker images
 ```
 
-## Virtual Machine
+## Virtual Machine (DEPRECATED)
 
 Alternatively, the following **virtual machine** image contains everything you need to go over the labs:
 
