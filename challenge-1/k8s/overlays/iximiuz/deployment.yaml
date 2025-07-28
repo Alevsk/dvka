@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nft-store
+  namespace: lab-1
+spec:
+  template:
+    spec:
+      serviceAccountName: lab-1-sa
+      containers:
+        - name: nft-store
+          env:
+            - name: DVKA_LAB1_FLAG
+              value: "<REPLACE WITH FLAG HERE>"
+            - name: DVKA_LAB1_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: signing-key
+                  key: key
