@@ -41,7 +41,7 @@ Options:
   --help                 Display this help menu.
 
 Available tools:
-  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei
+  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei, kube_review, static-curl, chisel
 EOF
 }
 
@@ -295,6 +295,39 @@ install_nuclei() {
   log_done "nuclei installed"
 }
 
+install_kube_review() {
+  log_info "Installing kube-review"
+  if ! command -v kube-review &> /dev/null; then
+    run_cmd "curl -Lo $WORKSHOP_DIR/kube-review.zip https://github.com/anderseknert/kube-review/releases/download/v0.4.0/kube-review-linux-amd64.zip"
+    run_cmd "unzip $WORKSHOP_DIR/kube-review.zip -d $WORKSHOP_DIR"
+    run_cmd "mv $WORKSHOP_DIR/kube-review-linux-amd64 /usr/local/bin/kube-review"
+    run_cmd "chmod +x /usr/local/bin/kube-review"
+    run_cmd "rm $WORKSHOP_DIR/kube-review.zip"
+  fi
+  log_done "kube-review installed"
+}
+
+install_chisel() {
+  log_info "Installing chisel"
+  if ! command -v chisel &> /dev/null; then
+    run_cmd "curl -Lo $WORKSHOP_DIR/chisel_1.10.1_linux_amd64.gz https://github.com/jpillora/chisel/releases/download/v1.10.1/chisel_1.10.1_linux_amd64.gz"
+    run_cmd "gzip -d $WORKSHOP_DIR/chisel_1.10.1_linux_amd64.gz"
+    run_cmd "mv $WORKSHOP_DIR/chisel_1.10.1_linux_amd64 /usr/local/bin/chisel"
+    run_cmd "chmod +x /usr/local/bin/chisel"
+  fi
+  log_done "chisel installed"
+}
+
+install_static_curl() {
+  log_info "Installing static-curl"
+  if ! command -v curl &> /dev/null; then
+    run_cmd "curl -Lo $WORKSHOP_DIR/curl-amd64 https://github.com/moparisthebest/static-curl/releases/download/v8.11.0/curl-amd64"
+    run_cmd "chmod +x $WORKSHOP_DIR/curl-amd64"
+    run_cmd "mv $WORKSHOP_DIR/curl-amd64 /usr/local/bin/static-curl"
+  fi
+  log_done "static-curl installed"
+}
+
 install_all_tools() {
   install_docker
   install_kind
@@ -307,6 +340,9 @@ install_all_tools() {
   install_terrascan
   install_kubeaudit
   install_nuclei
+  install_kube_review
+  install_static_curl
+  install_chisel
 }
 
 install_selected_tools() {
@@ -324,6 +360,9 @@ install_selected_tools() {
       terrascan) install_terrascan ;;
       kubeaudit) install_kubeaudit ;;
       nuclei) install_nuclei ;;
+      kube_review) install_kube_review ;;
+      static-curl) install_static_curl ;;
+      chisel) install_chisel ;;
       *)
         printf "Unknown tool: %s\n" "$tool"
         show_help

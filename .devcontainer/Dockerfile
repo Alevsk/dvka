@@ -99,3 +99,11 @@ RUN curl -Lo kube-review.zip https://github.com/anderseknert/kube-review/release
   mv kube-review-linux-amd64 /usr/local/bin/kube-review && \
   chmod +x /usr/local/bin/kube-review && \
   rm kube-review.zip
+
+RUN curl -Lo /usr/local/bin/chisel_1.10.1_linux_amd64.gz https://github.com/jpillora/chisel/releases/download/v1.10.1/chisel_1.10.1_linux_amd64.gz && \
+  gzip -d /usr/local/bin/chisel_1.10.1_linux_amd64.gz && \
+  mv /usr/local/bin/chisel_1.10.1_linux_amd64 /usr/local/bin/chisel && \
+  chmod +x /usr/local/bin/chisel
+
+RUN curl -Lo /usr/local/bin/static-curl https://github.com/moparisthebest/static-curl/releases/download/v8.11.0/curl-amd64 && \
+  chmod +x /usr/local/bin/static-curl
