@@ -41,7 +41,7 @@ Options:
   --help                 Display this help menu.
 
 Available tools:
-  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei, kube_review, static-curl, chisel
+  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei, kube_review, static_curl, chisel
 EOF
 }
 
@@ -320,7 +320,7 @@ install_chisel() {
 
 install_static_curl() {
   log_info "Installing static-curl"
-  if ! command -v curl &> /dev/null; then
+  if ! command -v static-curl &> /dev/null; then
     run_cmd "curl -Lo $WORKSHOP_DIR/curl-amd64 https://github.com/moparisthebest/static-curl/releases/download/v8.11.0/curl-amd64"
     run_cmd "chmod +x $WORKSHOP_DIR/curl-amd64"
     run_cmd "mv $WORKSHOP_DIR/curl-amd64 /usr/local/bin/static-curl"
@@ -361,7 +361,7 @@ install_selected_tools() {
       kubeaudit) install_kubeaudit ;;
       nuclei) install_nuclei ;;
       kube_review) install_kube_review ;;
-      static-curl) install_static_curl ;;
+      static_curl) install_static_curl ;;
       chisel) install_chisel ;;
       *)
         printf "Unknown tool: %s\n" "$tool"
