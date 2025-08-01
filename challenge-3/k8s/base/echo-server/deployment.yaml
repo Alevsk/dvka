@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-server
+spec:
+  selector:
+    matchLabels:
+      app: echo-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: echo-server
+    spec:
+      volumes:
+        - name: flag-vol
+          emptyDir: {}
+      initContainers:
+        - name: create-flag
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - echo "<CHALLENGE-3-FLAG-4-HERE>" > /mnt/flag/flag.txt
+          volumeMounts:
+            - name: flag-vol
+              mountPath: /mnt/flag
+      containers:
+        - name: echo-server
+          image: nginx:alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "<html><body>Hello from $(hostname)!</body></html>" > /usr/share/nginx/html/index.html && \
+              nginx -g "daemon off;"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: flag-vol
+              mountPath: /flag.txt
+              subPath: flag.txt

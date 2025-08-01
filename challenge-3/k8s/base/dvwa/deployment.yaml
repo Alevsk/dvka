@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dvwa
+  namespace: dvwa
+spec:
+  selector:
+    matchLabels:
+      app: dvwa
+  template:
+    metadata:
+      labels:
+        app: dvwa
+    spec:
+      containers:
+        - name: dvwa
+          image: vulnerables/web-dvwa:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: flag
+              mountPath: /flag.txt
+              subPath: flag.txt
+      volumes:
+        - name: flag
+          secret:
+            secretName: flag
