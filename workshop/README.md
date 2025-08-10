@@ -47,3 +47,11 @@ Learn everything you need to know to be proficient at `Kubernetes` security.
 ## 🔴 Red Team
 
 - [Common Attack Techniques](./red-team.md)
+- [Attacking Kubernetes: Tools and tactics to compromise your first cluster](https://labs.iximiuz.com/trainings/kubernetes-security-workshop-hands-on-attack-and-defense-e925c0d3)
+
+## 🟡 Blue Team
+
+- Digital forensics
+- telemtry
+- gitops
+- hardening
