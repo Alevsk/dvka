@@ -29,7 +29,7 @@ func app(w http.ResponseWriter, r *http.Request) {
 }
 
 func assets(w http.ResponseWriter, r *http.Request) {
-	dir, file := filepath.Split(fmt.Sprintf("static/%s", r.URL.Path))
+	dir, file := filepath.Split(fmt.Sprintf("static%s", r.URL.Path))
 	f, err := http.Dir(dir).Open(file)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
