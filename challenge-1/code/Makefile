@@ -77,4 +77,4 @@ docker-build:
 		.
 
 docker-run:
-	@docker run --rm -it $(IMAGE):$(TAG)
+	@docker run --rm -it -p 8080:8080 --name dvka-lab-1 $(IMAGE):$(TAG)

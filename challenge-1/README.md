@@ -1,10 +1,10 @@
-# Hack The NFT Museum
+# Hack The NFT Museum – Challenge 1
 
 Welcome to the NFT Museum challenge! In this scenario, you'll explore common security vulnerabilities in cloud-native environments by attempting to compromise a modern NFT marketplace running on Kubernetes.
 
 ## Scenario Overview
 
-You've discovered a new NFT marketplace that claims to be revolutionizing the digital art world. However, your security research suggests that the application might have some critical vulnerabilities. Your mission is to investigate the platform and find potential security flaws that could lead to a complete compromise of the underlying infrastructure.
+You've discovered a new NFT marketplace that claims to be revolutionizing the digital art world. However, your security research suggests that the application might have some critical vulnerabilities. Your mission is to investigate the platform and find potential security flaws that could lead to a compromise of the application.
 
 ![NFT Museum Store](./docs/images/nft-store.jpg)
 

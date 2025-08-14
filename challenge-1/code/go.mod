@@ -1,4 +1,4 @@
-module github.com/Alevsk/dvka/challenge-1
+module github.com/Alevsk/dvka/challenge-1/code
 
 go 1.21.5
 

@@ -28,7 +28,7 @@ spec:
             - containerPort: 8080
               name: http
           image: alevsk/dvka:lab-1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
