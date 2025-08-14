@@ -1,86 +1,45 @@
-# Challenge 1 - Hack The NFT Museum
+# Hack The NFT Museum
 
-## Requirements
+Welcome to the NFT Museum challenge! In this scenario, you'll explore common security vulnerabilities in cloud-native environments by attempting to compromise a modern NFT marketplace running on Kubernetes.
 
-- A running kubernetes cluster (you can use [Minikube](https://minikube.sigs.k8s.io/docs/start/) or [Kind](https://kind.sigs.k8s.io/))
-- [Kustomize](https://kustomize.io/)
-- Go 1.17 or newer <https://go.dev/dl/>
-- Make <https://www.gnu.org/software/make/>
+## Scenario Overview
 
-## Download Repository
+You've discovered a new NFT marketplace that claims to be revolutionizing the digital art world. However, your security research suggests that the application might have some critical vulnerabilities. Your mission is to investigate the platform and find potential security flaws that could lead to a complete compromise of the underlying infrastructure.
 
-```bash
-git clone https://github.com/Alevsk/dvka && cd dvka/challenge-1
-```
+![NFT Museum Store](./docs/images/nft-store.jpg)
 
-## Run Lab
+## Challenge Flags
 
-There are several ways to run this lab
+Your objective is to find the hidden flag by exploiting a series of vulnerabilities in the application. The path to success involves:
 
-- [Locally in your machine](#compile-and-run-the-lab-binary-locally)
-- [As a docker container](#build-docker-image-and-run-docker-container)
-- [Kubernetes deployment](#deploy-the-lab-to-kubernetes)
+* **Initial Access**
+  * Start by exploring the NFT marketplace's web interface
+  * Look for ways to manipulate the application's file handling mechanisms
+  * The flag is hidden somewhere in the infrastructure, but finding it will require chaining multiple vulnerabilities
 
-### Compile and Run the Lab Binary Locally
+## Attack Chain Overview
 
-```bash
-# compile the binary
-make && cd cmd/app
-# run the binary
-DVKA_LAB1_SIGNING_KEY="" DVKA_LAB1_FLAG="" ./lab1
-```
+This challenge simulates a realistic attack path that combines multiple security concepts:
 
-### Build Docker Image and Run Docker Container
+1. **Web Application Exploitation**: Begin by identifying and exploiting web application vulnerabilities
+2. **Infrastructure Interaction**: Learn how the application interacts with its underlying Kubernetes infrastructure
+3. **Kubernetes API Access**: Understand how to leverage compromised credentials to interact with the Kubernetes API
 
-```bash
-# build docker image
-TAG=alevsk/dvka:lab-1 make docker
-# run container using docker
-docker run --rm -p 8080:8080 -e DVKA_LAB1_SIGNING_KEY="" -e DVKA_LAB1_FLAG="" --name=dvka-labl-1 alevsk/dvka:lab-1
-# or using docker-compose
-docker-compose up -d
-```
+## Key Security Concepts
 
-### Deploy the Lab to Kubernetes
+* **Directory Traversal**
+  * Understanding how applications handle file paths
+  * Exploiting improper file path validation
 
-> Optional: configure various parameters of the challenge using `k8s/base/secret.yaml` and `k8s/base/deployment.yaml` files
+* **Server-Side Request Forgery (SSRF)**
+  * How internal services can be accessed through vulnerable applications
+  * The implications of SSRF in cloud-native environments
 
-```bash
-# deploy the Lab using
-kustomize build k8s/base | kubectl apply -f -
-# Expose lab-1 application service
-kubectl port-forward svc/nft-store 8080:8080 -n lab-1
-```
+* **Kubernetes Security**
+  * Service account tokens and their capabilities
+  * Interaction with the Kubernetes API server
+  * Container escape techniques
 
-## Access the Lab
+For technical setup and deployment instructions, please refer to the [Development Guide](./code/README.md) file.
 
-Open your browser and go to <http://localhost:8080/>
-
-![lab-1 app](./docs/images/nft-store.jpg)
-
-## Key Concepts for This Lab
-
-- [Directory traversal](https://en.wikipedia.org/wiki/Directory_traversal_attack)
-- [SSRF (Server Side Request Forgery)](https://portswigger.net/web-security/ssrf)
-- [Service account token](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens)
-- [Kube-apiserver](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/)
-
-## Terminate the Lab
-
-### Local Binary
-
-- Stop the program with `ctrl-c`
-
-### Docker
-
-- Stop the `docker run` command with `ctrl-c`
-- If using `docker-compose` then `docker-compose down`
-
-### Kubernetes
-
-- Stop the `port-forward` command with `ctrl-c`
-
-```bash
-# delete the lab from the cluster
-kustomize build k8s/base | kubectl delete -f -
-```
+Good luck, and happy hacking!

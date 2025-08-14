@@ -10,9 +10,3 @@ patches:
   - path: service.yaml
     target:
       kind: Service
-  - path: secret.yaml
-    target:
-      kind: Secret
-  - path: deployment.yaml
-    target:
-      kind: Deployment
