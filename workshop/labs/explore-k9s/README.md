@@ -6,7 +6,7 @@
 
 ## Running k9s from the cli
 
-![k9s ui](../images/k9s.png)
+![k9s ui](../../images/k9s.png)
 
 ## Resources
 
