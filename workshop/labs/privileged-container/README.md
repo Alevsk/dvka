@@ -1,4 +1,9 @@
-# Deploy privileged container, A Container That Doesn't Contain Anything
+# Privileged Containers
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -119,7 +124,7 @@ End the lab by `<ctrl-c>` from the privileged container
 
 ## Resources
 
-- <https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/>
-- <https://medium.com/nttlabs/the-internals-and-the-latest-trends-of-container-runtimes-2023-22aa111d7a93>
-- <https://github.com/shubheksha/kubernetes-internals>
-- <https://man7.org/linux/man-pages/man1/nsenter.1.html>
+- [Kubelet Reference](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
+- [The Internals and the Latest Trends of Container Runtimes](https://medium.com/nttlabs/the-internals-and-the-latest-trends-of-container-runtimes-2023-22aa111d7a93)
+- [Kubernetes Internals](https://github.com/shubheksha/kubernetes-internals)
+- [nsenter Man Page](https://man7.org/linux/man-pages/man1/nsenter.1.html)

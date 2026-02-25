@@ -1,4 +1,4 @@
-# Explore the `~/.kube/config` File
+# Exploring the `kubeconfig` File and `kubectl`
 
 ## Prerequisites
 
@@ -100,4 +100,4 @@ Use "kubectl options" for a list of global command-line options (applies to all 
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/tools/#kubectl>
+- [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)

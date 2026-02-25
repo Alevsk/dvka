@@ -1,4 +1,9 @@
-# Deploy Kubernetes Workload
+# Deploying a Kubernetes Workload
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Using Multiple Kubectl Commands
 
@@ -51,4 +56,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/>
+- [Run a Stateless Application Using a Deployment](https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/)

@@ -1,5 +1,10 @@
 # Pod Security Context
 
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
+
 ## Quick Start
 
 1. Deploy ubuntu pod
@@ -47,5 +52,5 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/configure-pod-container/security-context/>
-- <https://kubernetes.io/docs/concepts/security/pod-security-standards/>
+- [Configure a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+- [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/)

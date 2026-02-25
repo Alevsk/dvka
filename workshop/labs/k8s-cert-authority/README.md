@@ -1,4 +1,9 @@
-# Kubernetes certificate authority
+# Kubernetes Certificate Authority
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -68,4 +73,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/>
+- [Certificate Signing Requests](https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/)

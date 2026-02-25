@@ -1,4 +1,9 @@
-# Namespaces
+# Working with Namespaces
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -79,4 +84,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/>
+- [Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)

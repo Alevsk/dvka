@@ -1,4 +1,9 @@
-# Kubeaudit: Audit your Kubernetes clusters against common security controls
+# kubeaudit: Audit Your Kubernetes Clusters
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -121,4 +126,4 @@
 
 ## Resources
 
-- <https://github.com/Shopify/kubeaudit>
+- [Shopify kubeaudit](https://github.com/Shopify/kubeaudit)

@@ -1,5 +1,12 @@
 # Scratch Containers
 
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
+- Docker installed locally.
+- Go installed locally.
+
 ## Quick Start
 
 1. Take a look at the example application source code under `./encoding-service`
@@ -70,6 +77,6 @@
 
 ## Resources
 
-* <https://github.com/GoogleContainerTools/distroless>
-* <https://hub.docker.com/_/scratch>
-* <https://hub.docker.com/r/redhat/ubi8/tags>
+- [Google Container Tools Distroless](https://github.com/GoogleContainerTools/distroless)
+- [Docker Hub: Scratch](https://hub.docker.com/_/scratch)
+- [Docker Hub: Red Hat UBI](https://hub.docker.com/r/redhat/ubi8/tags)

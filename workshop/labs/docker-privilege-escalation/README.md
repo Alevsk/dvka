@@ -1,4 +1,4 @@
-# Privilege Escalation Using Docker Containers
+# Privilege Escalation with Docker
 
 ## Prerequisites
 
@@ -58,4 +58,4 @@
 
 ## Resources
 
-- <https://kind.sigs.k8s.io/docs/user/configuration/>
+- [Kind Configuration](https://kind.sigs.k8s.io/docs/user/configuration/)

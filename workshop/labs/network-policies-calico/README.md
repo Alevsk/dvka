@@ -1,4 +1,9 @@
-# Network Security Policies With Calico
+# Network Policies with Calico
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -164,6 +169,6 @@
 
 ## Resources
 
-- <https://docs.tigera.io/calico/latest/network-policy/get-started/kubernetes-policy/kubernetes-policy-basic#enable-isolation>
-- <https://docs.tigera.io/calico/latest/reference/resources/networkpolicy>
-- <https://docs.tigera.io/calico/latest/network-policy/policy-rules/namespace-policy>
+- [Calico Network Policy: Enable Isolation](https://docs.tigera.io/calico/latest/network-policy/get-started/kubernetes-policy/kubernetes-policy-basic#enable-isolation)
+- [Calico Network Policy Resource Reference](https://docs.tigera.io/calico/latest/reference/resources/networkpolicy)
+- [Calico Network Policy: Namespace Policy](https://docs.tigera.io/calico/latest/network-policy/policy-rules/namespace-policy)

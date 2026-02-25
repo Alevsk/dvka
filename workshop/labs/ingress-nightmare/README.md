@@ -1,4 +1,4 @@
-# CVE-2025-1974 – Ingress Nightmare
+# CVE-2021-25742: Ingress-NGINX Annotation Injection
 
 Welcome to the Kubernetes Security Ingress Nightmare Lab!  
 In this lab, you will learn how to exploit the **CVE-2025-1974** vulnerability in the **ingress-nginx** controller to gain access to the underlying container and then pivot to other systems. If you have not yet read about the vulnerability, I highly recommend doing so. Wiz researchers wrote an excellent post about the vulnerability and their research process: <https://www.wiz.io/blog/ingress-nginx-kubernetes-vulnerabilities>
@@ -11,7 +11,7 @@ In this lab, you will learn how to exploit the **CVE-2025-1974** vulnerability i
 
 ## Prerequisites
 
-- A Kubernetes cluster. See [Create New Kubernetes Cluster Using Kind](../create-cluster/README.md)
+- A Kubernetes cluster. See [Creating a Kubernetes Cluster with Kind](../create-cluster/README.md)
 
 ---
 
@@ -316,4 +316,4 @@ Compromising this service account token grants broad, read-only access to critic
 
 ## Resources
 
-- <https://www.wiz.io/blog/ingress-nginx-kubernetes-vulnerabilities>
+- [Ingress-NGINX Kubernetes Vulnerabilities (Wiz Blog)](https://www.wiz.io/blog/ingress-nginx-kubernetes-vulnerabilities)

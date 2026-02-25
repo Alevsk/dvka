@@ -1,4 +1,9 @@
-# Terrascan: Static code analyzer for Infrastructure as Code
+# Terrascan: Static Code Analysis for Infrastructure as Code
+
+## Prerequisites
+
+- Basic understanding of Infrastructure as Code.
+- Docker installed locally (optional).
 
 ## Quick Start
 
@@ -70,4 +75,4 @@ Detect compliance and security violations across Infrastructure as Code to mitig
 
 ## Resources
 
-- <https://github.com/tenable/terrascan>
+- [Tenable Terrascan](https://github.com/tenable/terrascan)

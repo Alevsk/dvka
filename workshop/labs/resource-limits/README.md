@@ -1,5 +1,10 @@
 # Pod Resource Limits
 
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
+
 ## Quick Start
 
 1. Install metrics server in your cluster
@@ -62,4 +67,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/#exceed-a-container-s-memory-limit>
+- [Assign Memory Resources to Containers and Pods](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/#exceed-a-container-s-memory-limit)

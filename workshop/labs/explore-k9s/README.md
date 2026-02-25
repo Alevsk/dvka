@@ -1,4 +1,4 @@
-# Explore k9s To Manage Your Cluster
+# Exploring Your Cluster with k9s
 
 ## Prerequisites
 
@@ -10,4 +10,4 @@
 
 ## Resources
 
-- <https://k9scli.io/topics/video/>
+- [k9s Videos](https://k9scli.io/topics/video/)

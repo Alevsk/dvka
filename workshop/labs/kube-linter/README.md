@@ -1,4 +1,9 @@
-# KubeLinter: Check Kubernetes YAML files and Helm charts
+# KubeLinter: Static Analysis for Kubernetes YAML Files and Helm Charts
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -59,5 +64,5 @@ KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm 
 
 ## Resources
 
-- <https://github.com/stackrox/kube-linter>
-- <https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/>
+- [StackRox KubeLinter](https://github.com/stackrox/kube-linter)
+- [Kubernetes Tutorial: Stateful Application](https://kubernetes.io/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/)

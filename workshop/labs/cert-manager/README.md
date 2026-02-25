@@ -1,4 +1,9 @@
-# cert-manager: X.509 certificate management for Kubernetes
+# cert-manager: X.509 Certificate Management for Kubernetes
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -74,5 +79,5 @@
 
 ## Resources
 
-- <https://cert-manager.io/docs/installation/>
-- <https://cert-manager.io/docs/tutorials/acme/nginx-ingress/>
+- [cert-manager Installation](https://cert-manager.io/docs/installation/)
+- [cert-manager Tutorials: NGINX Ingress](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/)

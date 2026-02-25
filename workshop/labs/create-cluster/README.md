@@ -1,4 +1,4 @@
-# Create New Kubernetes Cluster Using Kind
+# Creating a Kubernetes Cluster with Kind
 
 ## Prerequisites
 
@@ -25,4 +25,4 @@ for image in $(cat ../../images.txt); do kind load docker-image $image --name wo
 
 ## Resources
 
-- <https://kind.sigs.k8s.io/docs/user/configuration/>
+- [Kind Configuration](https://kind.sigs.k8s.io/docs/user/configuration/)

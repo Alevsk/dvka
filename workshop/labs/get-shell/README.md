@@ -1,4 +1,9 @@
-# Get a Shell to a Running Container
+# Getting a Shell to a Running Container
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -35,4 +40,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/>
+- [Get a Shell to a Running Container](https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/)

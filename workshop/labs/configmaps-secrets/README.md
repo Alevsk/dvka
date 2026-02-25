@@ -1,4 +1,9 @@
-# Configmaps & Secrets
+# Managing Configuration with ConfigMaps and Secrets
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Configmap
 
@@ -85,6 +90,6 @@ kubectl delete secret nginx-tls-certificates
 
 ## Resources
 
-- <https://kubernetes.io/docs/concepts/configuration/configmap/>
-- <https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/>
-- <https://kubernetes.io/docs/concepts/configuration/secret/>
+- [ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)
+- [Configure a Pod to Use a ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)
+- [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)

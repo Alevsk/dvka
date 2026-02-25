@@ -1,4 +1,10 @@
-# kube-hunter: Hunt for security weaknesses in Kubernetes clusters
+# kube-hunter: Hunt for Security Weaknesses in Kubernetes Clusters
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
+- Python and `pip` installed locally, or Docker.
 
 ## Quick Start
 
@@ -68,4 +74,4 @@
 
 ## Resources
 
-- <https://github.com/aquasecurity/kube-hunter>
+- [Aqua Security kube-hunter](https://github.com/aquasecurity/kube-hunter)

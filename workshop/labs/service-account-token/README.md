@@ -1,4 +1,9 @@
-# Service Account Token
+# Service Account Tokens
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
@@ -81,4 +86,4 @@
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>
+- [Configure Service Accounts for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)

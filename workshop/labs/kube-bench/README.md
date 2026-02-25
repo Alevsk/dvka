@@ -1,5 +1,10 @@
 # Kube-bench: CIS Kubernetes Benchmark
 
+## Prerequisites
+
+- A running Kubernetes cluster.
+- `kubectl` installed and configured to connect to your cluster.
+
 ## Quick Start
 
 Checks whether Kubernetes is deployed according to security best practices as defined in the [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
@@ -37,5 +42,5 @@ Checks whether Kubernetes is deployed according to security best practices as de
 
 ## Resources
 
-- <https://github.com/aquasecurity/kube-bench>
-- <https://www.cisecurity.org/benchmark/kubernetes>
+- [Aqua Security kube-bench](https://github.com/aquasecurity/kube-bench)
+- [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
