@@ -1,8 +1,10 @@
-# Cluster internal networking
+# Cluster Internal Networking
+
+This document describes how an attacker can use the internal network to move laterally within the cluster.
+
+## Description
 
 Kubernetes networking behavior allows traffic between pods in the cluster as a default behavior. Attackers who gain access to a single container may use it for network reachability to another container in the cluster.
-
-## Quick Start
 
 1. Look at `tenant-1.yaml` file and deploy all the resources for application 1
 
@@ -166,9 +168,4 @@ Kubernetes networking behavior allows traffic between pods in the cluster as a d
 
 ## Resources
 
-- <https://kubernetes.io/docs/concepts/services-networking/network-policies/>
-- <https://kubernetes.courselabs.co/labs/networkpolicy/>
-- <https://github.com/ahmetb/kubernetes-network-policy-recipes>
-- <https://docs.tigera.io/calico/latest/network-policy/get-started/kubernetes-policy/kubernetes-policy-basic#enable-isolation>
-- <https://docs.tigera.io/calico/latest/reference/resources/networkpolicy>
-- <https://docs.tigera.io/calico/latest/network-policy/policy-rules/namespace-policy>
+- [Kubernetes Networking](https://kubernetes.io/docs/concepts/cluster-administration/networking/)

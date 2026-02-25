@@ -1,8 +1,10 @@
-# Pod or container name similarity
+# Pod / Container Name Similarity
 
-Pods that are created by controllers such as Deployment or DaemonSet have random suffix in their names. Attackers can use this fact and name their backdoor pods as they were created by the existing controllers. For example, an attacker could create a malicious pod named `coredns-{random suffix}` which would look related to the CoreDNS Deployment.
+This document describes how an attacker can use pod or container name similarity to hide their malicious activity.
 
-Also, attackers can deploy their containers in the kube-system namespace where the administrative containers reside.
+## Description
+
+Attackers may give their pods and containers names that are similar to the names of other objects in the cluster. This can be used to hide their malicious activity from the cluster administrator.
 
 ## Quick Start
 
@@ -37,3 +39,5 @@ Also, attackers can deploy their containers in the kube-system namespace where t
     ```
 
 ## Resources
+
+- [Kubernetes Pods](https://kubernetes.io/docs/concepts/workloads/pods/)

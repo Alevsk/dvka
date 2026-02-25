@@ -1,5 +1,11 @@
-# Writable hostPath mount
+# Writable hostPath Mount
 
-hostPath volume mounts a directory or a file from the host to the container. Attackers who have permissions to create a new container in the cluster may create one with a writable hostPath volume and gain persistence on the underlying host. For example, the latter can be achieved by creating a cron job on the host.
+This document describes how an attacker can use a writable hostPath mount to escape to the host.
+
+## Description
+
+A hostPath volume mounts a file or directory from the host node’s filesystem into your Pod. Attackers who have permissions to create pods with a writable hostPath mount can use it to escape the container and get access to the host.
 
 ## Resources
+
+- [Kubernetes hostPath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)

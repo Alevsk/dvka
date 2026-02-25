@@ -1,5 +1,11 @@
-# New container
+# New Container
 
-Attackers may attempt to run their code in the cluster by deploying a container. Attackers who have permissions to deploy a pod or a controller in the cluster (such as DaemonSet \ ReplicaSet\ Deployment) can create a new resource for running their code.
+This document describes how an attacker can run their code in a new container.
+
+## Description
+
+Attackers who have permissions to create containers in the cluster can run their malicious code in a new container.
 
 ## Resources
+
+- [Kubernetes Pods](https://kubernetes.io/docs/concepts/workloads/pods/)

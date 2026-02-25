@@ -1,10 +1,13 @@
-# Malicious admission controller
+# Malicious Admission Controller
 
-Admission controller is a Kubernetes component that intercepts, and possibly modifies, requests to the Kubernetes API server. There are two types of admissions controllers: `validating` and `mutating` controllers. As the name implies, a mutating admission controller can modify the intercepted request and change its properties. Kubernetes has a built-in generic admission controller named `MutatingAdmissionWebhook`.
+This document describes how an attacker can use a malicious admission controller to gain persistence in the cluster.
 
-The behavior of this admission controller is determined by an admission webhook that the user deploys in the cluster. Attackers can use such webhooks for gaining persistence in the cluster. For example, attackers can intercept and modify the pod creation operations in the cluster and add their malicious container to every created pod.
+## Description
+
+Admission controllers are a powerful Kubernetes feature that can be used to enforce security policies in the cluster. Admission controllers intercept and process requests to the Kubernetes API server. There are two types of admission controllers: validating admission controllers and mutating admission controllers. Validating admission controllers can only approve or deny requests, while mutating admission controllers can also modify the requests.
+
+Attackers who have permissions to create and modify admission controllers can use them for various malicious purposes. For example, attackers can use a mutating admission controller to inject their malicious code into any new pod that is created in the cluster.
 
 ## Resources
 
-- <https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/>
-- <https://blog.rewanthtammana.com/creating-malicious-admission-controllers>
+- [Kubernetes Admission Controllers](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/)

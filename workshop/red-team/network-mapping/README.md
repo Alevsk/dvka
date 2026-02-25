@@ -1,7 +1,12 @@
-# Network mapping
+# Network Mapping
 
-Attackers may try to map the cluster network to get information on the running applications, including scanning for known vulnerabilities. By default, there is no restriction on pods communication in Kubernetes. Therefore, attackers who gain access to a single container, may use it to probe the network.
+This document describes how an attacker can use network mapping to discover services in the cluster.
+
+## Description
+
+Attackers may use network scanning tools such as `nmap` or `zmap` to map the cluster’s network. This can be used to identify running services in the cluster and find vulnerable applications.
 
 ## Resources
 
-- <https://github.com/projectdiscovery/naabu>
+- [nmap](https://nmap.org/)
+- [zmap](https://zmap.io/)

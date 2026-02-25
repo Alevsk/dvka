@@ -1,31 +1,34 @@
-# Exec into container
+# Exec into Container
+
+This document describes how an attacker can use `kubectl exec` to run commands in a container.
+
+## Description
 
 Attackers who have permissions, can run malicious commands in containers in the cluster using exec command (“kubectl exec”). In this method, attackers can use legitimate images, such as an OS image (e.g., Ubuntu) as a backdoor container, and run their malicious code remotely by using “kubectl exec”.
 
 ## Quick Start
 
-1. Deploy nginx as a pod (notice we are not creating a `deployment` this time)
+1.  **Deploy a Pod**
+
+    Deploy an NGINX pod to your cluster:
 
     ```bash
-    # create nginx pod
     kubectl apply -f nginx.yaml
     ```
 
-2. Exec into the running container
+2.  **Exec into the Pod**
 
-    **kubectl:**
+    Exec into the pod and get a shell:
 
     ```bash
-    kubectl exec -it pod/nginx -- sh
+    kubectl exec -it nginx -- sh
     ```
 
-3. Explore the nginx container file system
+3.  **Explore the Container**
 
-    - `top` command
-    - `ls` (/proc, /sys, /dev, /etc) command
-    - `printenv`
+    Once you have a shell to the container, you can explore its filesystem and run commands.
 
-4. Terminate nginx pod
+## Cleanup
 
     ```bash
     kubectl delete -f nginx.yaml
@@ -33,5 +36,4 @@ Attackers who have permissions, can run malicious commands in containers in the 
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/debug/debug-application/get-shell-running-container/>
-- <https://kubernetes-threat-matrix.redguard.ch/execution/bash-cmd-in-container/>
+- [kubectl exec](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#exec)

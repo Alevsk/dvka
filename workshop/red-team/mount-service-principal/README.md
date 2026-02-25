@@ -1,8 +1,12 @@
-# Mount service principal
+# Mount Service Principal
 
-When the cluster is deployed in the cloud, in some cases attackers can leverage their access to a container in the cluster to gain cloud credentials. For example, in AKS each node contains service principal credential.
+This document describes how an attacker can mount a service principal to gain access to cloud resources.
+
+## Description
+
+AKS has an option to authenticate with Azure using a service principal. When this option is enabled, each node stores service principal credentials that are located in `/etc/kubernetes/azure.json`. AKS uses this service principal to create and manage Azure resources that are needed for the cluster operation. By default, the service principal has contributor permissions in the cluster’s Resource Group. Attackers who get access to this service principal file (by hostPath mount, for example) can use its credentials to access or modify the cloud resources.
 
 ## Resources
 
-- <https://learn.microsoft.com/en-us/azure/aks/kubernetes-service-principal>
-- <https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/>
+- [AKS Service Principals](https://learn.microsoft.com/en-us/azure/aks/kubernetes-service-principal)
+- [Extracting Credentials from Azure Kubernetes Service](https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/)

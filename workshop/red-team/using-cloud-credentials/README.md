@@ -1,9 +1,11 @@
-# Using cloud credentials
+# Using Cloud Credentials
 
-In cases where the Kubernetes cluster is deployed in a public cloud (e.g., AKS in Azure, GKE in GCP, or EKS in AWS), compromised cloud credential can lead to cluster takeover. Attackers who have access to the cloud account credentials can get access to the cluster’s management layer.
+This document describes how an attacker can use compromised cloud credentials to gain access to the cluster.
+
+## Description
+
+If attackers get access to cloud credentials, they can use them to access the cluster. For example, in AKS, users can be authenticated with Azure Active Directory (Azure AD). Attackers who get access to the credentials of a user with permissions to the cluster can use them to access the cluster.
 
 ## Resources
 
-- <https://github.com/kgretzky/evilginx2>
-- <https://github.com/An0nUD4Y/Evilginx2-Phishlets/blob/master/google.yaml>
-- <https://github.com/An0nUD4Y/Evilginx2-Phishlets/blob/master/aws.yaml>
+- [AKS - Azure AD Integration](https://learn.microsoft.com/en-us/azure/aks/managed-aad)

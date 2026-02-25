@@ -1,4 +1,8 @@
-# Access cloud resources
+# Accessing Cloud Resources
+
+This document describes how an attacker can leverage access to a single container to gain access to other cloud resources outside the cluster.
+
+## Description
 
 If the Kubernetes cluster is deployed in the cloud, in some cases attackers can leverage their access to a single container to get access to other cloud resources outside the cluster. For example, AKS uses several managed identities that are attached to the nodes, for the cluster operation. Similar identities exist also in EKS and GKE (EC2 roles and IAM service accounts, respectively). By default, running pods can retrieve the identities which in some configurations have privileged permissions. Therefore, if attackers gain access to a running pod in the cluster, they can leverage the identities to access external cloud resources.
 
@@ -8,5 +12,5 @@ By default, the service principal has contributor permissions in the cluster’s
 
 ## Resources
 
-- <https://learn.microsoft.com/en-us/azure/aks/kubernetes-service-principal>
-- <https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/>
+- [AKS Service Principals](https://learn.microsoft.com/en-us/azure/aks/kubernetes-service-principal)
+- [Extracting Credentials from Azure Kubernetes Service](https://www.netspi.com/blog/technical/cloud-penetration-testing/extract-credentials-from-azure-kubernetes-service/)

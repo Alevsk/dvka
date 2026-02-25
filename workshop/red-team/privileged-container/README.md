@@ -1,6 +1,10 @@
-# Privileged container
+# Privileged Container
 
-A privileged container is a container that has all the capabilities of the host machine, which lifts all the limitations regular containers have. Practically, this means that privileged containers can do almost every action that can be performed directly on the host. Attackers who gain access to a privileged container, or have permissions to create a new privileged container (by using the compromised pod’s service account, for example), can get access to the host’s resources.
+This document describes how an attacker can use a privileged container to escape to the host.
+
+## Description
+
+Privileged containers are containers that are running with the `--privileged` flag. This flag gives the container all the capabilities of the host machine. Attackers who have permissions to create privileged containers can use them to escape the container and get access to the host.
 
 ## Quick Start
 
@@ -121,7 +125,8 @@ End the lab by `<ctrl-c>` from the privileged container
 
 ## Resources
 
-- <https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/>
-- <https://medium.com/nttlabs/the-internals-and-the-latest-trends-of-container-runtimes-2023-22aa111d7a93>
-- <https://github.com/shubheksha/kubernetes-internals>
-- <https://man7.org/linux/man-pages/man1/nsenter.1.html>
+- [Privileged Containers](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- [Kubelet](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
+- [Container Runtimes](https://medium.com/nttlabs/the-internals-and-the-latest-trends-of-container-runtimes-2023-22aa111d7a93)
+- [Kubernetes Internals](https://github.com/shubheksha/kubernetes-internals)
+- [Nsenter](https://man7.org/linux/man-pages/man1/nsenter.1.html)

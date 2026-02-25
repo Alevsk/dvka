@@ -1,7 +1,11 @@
-# SSH server running inside container
+# SSH Server Running
 
-SSH server that is running inside a container may be used by attackers. If attackers gain valid credentials to a container, whether by brute force attempts or by other methods (such as phishing), they can use it to get remote access to the container by SSH.
+This document describes how an attacker can use an SSH server running in a container to gain remote access.
+
+## Description
+
+Attackers may run an SSH server in a container to get a remote shell to the container. This can be used to execute commands in the container and to exfiltrate data from the container.
 
 ## Resources
 
-- <https://hub.docker.com/r/linuxserver/openssh-server>
+- [OpenSSH Server on Docker Hub](https://hub.docker.com/r/linuxserver/openssh-server)

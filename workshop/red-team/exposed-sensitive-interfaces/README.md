@@ -1,4 +1,8 @@
-# Exposed sensitive interfaces
+# Exposed Sensitive Interfaces
+
+This document describes how an attacker can exploit exposed sensitive interfaces to gain access to the cluster.
+
+## Description
 
 Exposing a sensitive interface to the internet or within a cluster without strong authentication poses a security risk. Some popular cluster management services were not intended to be exposed to the internet, and therefore don’t require authentication by default. Thus, exposing such services to the internet allows unauthenticated access to a sensitive interface which might enable running code or deploying containers in the cluster by a malicious actor. Examples of such interfaces that were seen exploited include Apache NiFi, Kubeflow, Argo Workflows, Weave Scope, and the Kubernetes dashboard.
 
@@ -45,5 +49,4 @@ In addition, having such services exposed within the cluster network without str
 
 ## Resources
 
-- <https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
-- <https://medium.com/@tejaswi.goudru/disable-authentication-https-in-kubernetes-dashboard-2fada478ce91>
+- [Kubernetes Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
