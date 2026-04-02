@@ -22,8 +22,10 @@ if [[ -n "$SUDO_USER" ]]; then
     USER_TO_ADD_TO_DOCKER="$SUDO_USER"
 else
     # This is a fallback. The script is best used with a direct 'sudo' call.
-    printf "Warning: Could not determine the user who ran sudo via $SUDO_USER.\n" >&2
-    printf "You may need to manually add your user to the 'docker' group with: sudo usermod -aG docker $USER\n" >&2
+    printf "\n⚠️  Warning: Could not determine the invoking user (SUDO_USER is not set).\n" >&2
+    printf "   If Docker is installed, you will need to manually add your user to the 'docker' group:\n" >&2
+    printf "     sudo usermod -aG docker YOUR_USERNAME\n" >&2
+    printf "   Then log out and log back in, or run: newgrp docker\n\n" >&2
     # Setting a placeholder to avoid errors, but it won't be used effectively.
     USER_TO_ADD_TO_DOCKER="ubuntu"
 fi

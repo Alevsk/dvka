@@ -35,9 +35,14 @@ You can install the required tools for this workshop by running the `install-too
 ```bash
 # make it executable
 chmod +x install-tools.sh
-# install all required tools for this workshop 
+# install all required tools for this workshop
 sudo ./install-tools.sh --install
 ```
+
+> [!WARNING]
+> **Docker group permissions:** When Docker is installed for the first time, your user must be added to the `docker` group to run Docker commands without `sudo`. The install script does this automatically, but the change only takes effect after you **log out and log back in**, or run `newgrp docker` in your current terminal. If you skip this step, commands like `docker`, `kind`, and `kubectl` (when using Kind) will fail with permission errors.
+>
+> Alternatively, you can run the entire workshop as the `root` user to avoid group permission issues entirely.
 
 Example output:
 
