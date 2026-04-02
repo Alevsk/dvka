@@ -1,0 +1,31 @@
+---
+# Scenario B: A non-privileged pod that mounts a sensitive host path.
+# Even without full privilege escalation, mounting specific host directories
+# can expose node credentials, container runtime sockets, or SSH keys.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: attacker-hostpath
+  namespace: default
+  labels:
+    app: attacker-hostpath
+spec:
+  containers:
+    - name: shell
+      image: alpine:3.19
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: kubelet-dir
+          mountPath: /kubelet
+          readOnly: true
+        - name: containerd-sock
+          mountPath: /run/containerd/containerd.sock
+  volumes:
+    - name: kubelet-dir
+      hostPath:
+        path: /var/lib/kubelet
+        type: Directory
+    - name: containerd-sock
+      hostPath:
+        path: /run/containerd/containerd.sock
+        type: Socket

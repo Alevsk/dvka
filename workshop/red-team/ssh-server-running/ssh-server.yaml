@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ssh-lab
+---
+# The SSH authorized_keys content is stored in a ConfigMap so it can
+# be changed without rebuilding an image. Replace the placeholder with
+# your actual public key before deploying.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssh-config
+  namespace: ssh-lab
+data:
+  # Generate a key pair with: ssh-keygen -t ed25519 -f /tmp/dvka-ssh -N ""
+  # Then paste the content of /tmp/dvka-ssh.pub below.
+  authorized_keys: |
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPLACEHOLDER_REPLACE_WITH_YOUR_PUBLIC_KEY dvka-demo
+  sshd_config: |
+    Port 2222
+    ListenAddress 0.0.0.0
+    PermitRootLogin yes
+    PasswordAuthentication no
+    PubkeyAuthentication yes
+    AuthorizedKeysFile /root/.ssh/authorized_keys
+    # Disable strict mode so the injected key file permissions are accepted
+    StrictModes no
+    # Keep sessions alive
+    ClientAliveInterval 30
+    ClientAliveCountMax 10
+    LogLevel VERBOSE
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssh-backdoor
+  namespace: ssh-lab
+  labels:
+    app: ssh-backdoor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssh-backdoor
+  template:
+    metadata:
+      labels:
+        app: ssh-backdoor
+    spec:
+      containers:
+        - name: sshd
+          image: alpine:3.19
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache openssh-server curl > /dev/null 2>&1
+              mkdir -p /root/.ssh /var/empty
+              cp /config/authorized_keys /root/.ssh/authorized_keys
+              chmod 600 /root/.ssh/authorized_keys
+              cp /config/sshd_config /etc/ssh/sshd_config
+              ssh-keygen -A > /dev/null 2>&1
+              echo "[ssh-backdoor] SSH server starting on port 2222..."
+              /usr/sbin/sshd -D -e
+          ports:
+            - containerPort: 2222
+          volumeMounts:
+            - name: ssh-config-volume
+              mountPath: /config
+      volumes:
+        - name: ssh-config-volume
+          configMap:
+            name: ssh-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssh-backdoor
+  namespace: ssh-lab
+spec:
+  selector:
+    app: ssh-backdoor
+  ports:
+    - name: ssh
+      protocol: TCP
+      port: 2222
+      targetPort: 2222

@@ -1,0 +1,52 @@
+---
+# ResourceQuota applied to a legitimate namespace to show how
+# resource hijacking in another namespace causes quota exhaustion
+# and legitimate workloads to be denied CPU/memory.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "2Gi"
+    limits.cpu: "4"
+    limits.memory: "4Gi"
+    pods: "10"
+---
+# A legitimate workload in the production namespace
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legitimate-app
+  namespace: production
+  labels:
+    app: legitimate-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: legitimate-app
+  template:
+    metadata:
+      labels:
+        app: legitimate-app
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.25-alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

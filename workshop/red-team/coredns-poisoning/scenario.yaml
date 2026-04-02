@@ -1,0 +1,127 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: coredns-demo
+  labels:
+    scenario: coredns-poisoning
+
+---
+# Legitimate target service — the service that will be impersonated
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  namespace: coredns-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: target
+  template:
+    metadata:
+      labels:
+        role: target
+    spec:
+      containers:
+        - name: target
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+          # Serve a custom page so we can distinguish legitimate vs intercepted responses
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /usr/share/nginx/html
+              echo 'Hello from the LEGITIMATE TARGET service' > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-svc
+  namespace: coredns-demo
+spec:
+  selector:
+    role: target
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+# Attacker-controlled interceptor — will receive traffic after DNS poisoning
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interceptor
+  namespace: coredns-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: interceptor
+  template:
+    metadata:
+      labels:
+        role: interceptor
+    spec:
+      containers:
+        - name: interceptor
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+          # Serve a response that identifies itself as the interceptor
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /usr/share/nginx/html
+              echo '*** INTERCEPTED by attacker pod ***' > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: interceptor-svc
+  namespace: coredns-demo
+spec:
+  selector:
+    role: interceptor
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+# Victim pod — the innocent client making requests to target-svc
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victim
+  namespace: coredns-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: victim
+  template:
+    metadata:
+      labels:
+        role: victim
+    spec:
+      containers:
+        - name: victim
+          image: nginx:stable-alpine3.17-slim
+          command:
+            - sh
+            - -c
+            - apk add --no-cache curl bind-tools && sleep infinity
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"

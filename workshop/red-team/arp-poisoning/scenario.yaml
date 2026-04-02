@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: arp-demo
+  labels:
+    scenario: arp-poisoning
+
+---
+# Target server — the legitimate service receiving traffic from the victim
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  namespace: arp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: target
+  template:
+    metadata:
+      labels:
+        role: target
+    spec:
+      # Co-locate with attacker pod on the same node for L2 ARP attacks
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  role: attacker
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: target
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /usr/share/nginx/html
+              echo 'Hello from the target server' > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-svc
+  namespace: arp-demo
+spec:
+  selector:
+    role: target
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+# Victim pod — sends traffic to the target, unaware of the attack
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victim
+  namespace: arp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: victim
+  template:
+    metadata:
+      labels:
+        role: victim
+    spec:
+      # Co-locate with attacker pod on the same node for L2 ARP attacks
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  role: attacker
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: victim
+          image: nginx:stable-alpine3.17-slim
+          command:
+            - sh
+            - -c
+            - apk add --no-cache curl && sleep infinity
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+
+---
+# Attacker pod — requires NET_ADMIN and NET_RAW to perform ARP poisoning
+# These capabilities allow manipulation of the network stack and raw packet crafting
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attacker
+  namespace: arp-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: attacker
+  template:
+    metadata:
+      labels:
+        role: attacker
+    spec:
+      containers:
+        - name: attacker
+          # kalilinux/kali-rolling provides arpspoof (dsniff), ettercap, and tcpdump
+          image: kalilinux/kali-rolling:latest
+          command:
+            - sh
+            - -c
+            - |
+              apt-get update -qq && \
+              apt-get install -y -qq dsniff ettercap-text-only tcpdump iproute2 net-tools curl \
+                2>/dev/null
+              sleep infinity
+          securityContext:
+            privileged: true  # Required: NET_ADMIN+NET_RAW alone cannot write sysctl in Kind
+            capabilities:
+              add:
+                - NET_ADMIN   # Required: manipulate network interfaces and routing
+                - NET_RAW     # Required: send raw packets (ARP, ICMP)
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

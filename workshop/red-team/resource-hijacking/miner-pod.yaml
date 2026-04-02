@@ -1,0 +1,46 @@
+---
+# Simulated cryptominer pod using CPU stress.
+# In a real attack this would run an actual mining binary (e.g., xmrig).
+# Here we use the 'stress' tool to consume CPU cycles, which produces
+# the same observable signals: high CPU usage, anomalous process names.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cryptominer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "logger"
+  namespace: cryptominer
+  labels:
+    # Disguised with an innocuous-looking label to blend in
+    app: "logger"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "logger"
+  template:
+    metadata:
+      labels:
+        app: "logger"
+    spec:
+      containers:
+        - name: "log-agent"
+          image: progrium/stress:latest
+          # Simulate a miner: spawn 2 CPU workers running indefinitely.
+          # The --timeout 0 flag means it runs until the container is killed.
+          command:
+            - stress
+            - --cpu
+            - "2"
+            - --timeout
+            - "86400"
+          resources:
+            # No resource limits set — this is intentional to show the
+            # danger of running workloads without resource constraints.
+            requests:
+              cpu: "10m"
+              memory: "16Mi"
+          # No securityContext restrictions — another red flag in real clusters.

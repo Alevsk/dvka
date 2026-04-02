@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: event-generator
+  namespace: default
+  labels:
+    app: event-generator
+spec:
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+  restartPolicy: Never

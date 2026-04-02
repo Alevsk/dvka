@@ -1,0 +1,97 @@
+---
+# Namespace for DoS attack scenarios
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dos-lab
+---
+# Scenario 1: A legitimate application that will be starved of resources
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victim-app
+  namespace: dos-lab
+  labels:
+    app: victim-app
+    scenario: resource-exhaustion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victim-app
+  template:
+    metadata:
+      labels:
+        app: victim-app
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.25-alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: victim-app
+  namespace: dos-lab
+spec:
+  selector:
+    app: victim-app
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# Scenario 2: ResourceQuota on the namespace — attacker will exhaust it
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dos-lab-quota
+  namespace: dos-lab
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "1"
+    requests.memory: "512Mi"
+---
+# Scenario 3: Fork-bomb container (demonstrates container-level DoS)
+# Apply manually when ready for that demo step.
+# kubectl apply -f dos-scenarios.yaml --field-manager=fork-bomb
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fork-bomb
+  namespace: dos-lab
+  labels:
+    scenario: fork-bomb
+    app: fork-bomb
+spec:
+  # restartPolicy Never so it does not respawn after the node OOM kills it
+  restartPolicy: Never
+  containers:
+    - name: fork-bomb
+      image: ubuntu:22.04
+      command:
+        - bash
+        - -c
+        # Memory exhaustion — allocates memory in a loop until OOMKilled by cgroups.
+        # With resource limits set (256Mi) this is contained to the pod cgroup.
+        # The container will be OOMKilled once it exceeds its memory limit (exit code 137).
+        - |
+          echo "Starting memory exhaustion..."
+          tail /dev/zero
+      resources:
+        # Limits contain the blast radius to this single pod's cgroup
+        limits:
+          cpu: "500m"
+          memory: "256Mi"
+        requests:
+          cpu: "100m"
+          memory: "128Mi"

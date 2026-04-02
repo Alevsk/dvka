@@ -1,0 +1,28 @@
+---
+# Scenario A: A privileged pod that mounts the host filesystem.
+# An attacker with pod creation rights deploys this to escape
+# the container boundary and read or write to the underlying node.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: attacker-privileged
+  namespace: default
+  labels:
+    app: attacker-privileged
+spec:
+  # hostPID: true lets the container see all host processes
+  hostPID: true
+  containers:
+    - name: shell
+      image: alpine:3.19
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: host-root
+          mountPath: /host
+  volumes:
+    - name: host-root
+      hostPath:
+        path: /
+        type: Directory

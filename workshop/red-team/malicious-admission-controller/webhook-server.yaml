@@ -1,0 +1,71 @@
+---
+# Namespace for the malicious webhook components
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webhook-system
+  labels:
+    app: malicious-webhook
+---
+# The webhook server itself — a simple Go/Python HTTP server that
+# receives AdmissionReview requests and injects a sidecar into every pod.
+# We use a pre-built image that serves a minimal mutating webhook.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: malicious-webhook
+  namespace: webhook-system
+  labels:
+    app: malicious-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: malicious-webhook
+  template:
+    metadata:
+      labels:
+        app: malicious-webhook
+    spec:
+      containers:
+        - name: webhook
+          # This image runs the webhook server defined in webhook-server.py.
+          # We use python:3.11-slim and mount the server script via ConfigMap.
+          image: python:3.11-slim
+          command:
+            - python3
+            - /app/webhook-server.py
+          ports:
+            - containerPort: 8443
+              name: https
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /certs
+              readOnly: true
+            - name: webhook-server-code
+              mountPath: /app
+          env:
+            - name: TLS_CERT
+              value: /certs/tls.crt
+            - name: TLS_KEY
+              value: /certs/tls.key
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: webhook-tls
+        - name: webhook-server-code
+          configMap:
+            name: webhook-server-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: malicious-webhook
+  namespace: webhook-system
+spec:
+  selector:
+    app: malicious-webhook
+  ports:
+    - port: 443
+      targetPort: 8443
+      name: https

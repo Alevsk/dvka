@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: nginx-tls
 spec:
   selector:
     matchLabels:
-      app: nginx
+      app: nginx-tls
   replicas: 2
   template:
     metadata:
       labels:
-        app: nginx
+        app: nginx-tls
     spec:
       volumes:
         - name: server-configuration
@@ -41,10 +41,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx
+  name: nginx-tls
 spec:
   selector:
-    app: nginx
+    app: nginx-tls
   ports:
     - protocol: TCP
       port: 8443

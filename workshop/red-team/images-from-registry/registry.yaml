@@ -1,0 +1,60 @@
+---
+# Local Docker Registry deployed inside the Kind cluster
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-registry
+  namespace: default
+  labels:
+    app: private-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: private-registry
+  template:
+    metadata:
+      labels:
+        app: private-registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:2
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: "Registry Realm"
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /auth/htpasswd
+          volumeMounts:
+            - name: auth-volume
+              mountPath: /auth
+      initContainers:
+        - name: create-htpasswd
+          image: httpd:2.4-alpine
+          command:
+            - sh
+            - -c
+            - |
+              htpasswd -Bbn reguser regpassword > /auth/htpasswd
+          volumeMounts:
+            - name: auth-volume
+              mountPath: /auth
+      volumes:
+        - name: auth-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: private-registry
+  namespace: default
+spec:
+  selector:
+    app: private-registry
+  ports:
+    - port: 5000
+      targetPort: 5000

@@ -1,92 +1,268 @@
 # Container Service Account
 
-This document describes how an attacker can use a container's service account to gain access to the cluster.
+Every pod in Kubernetes has a service account identity. By default, the corresponding token is automatically mounted into the container's filesystem. An attacker who gains shell access to any pod can read this token and use it to authenticate to the Kubernetes API server.
 
 ## Description
 
-Service account (SA) represents an application identity in Kubernetes. By default, a Service Account access token is mounted to every created pod in the cluster and containers in the pod can send requests to the Kubernetes API server using the Service Account credentials. Attackers who get access to a pod can access the Service Account token (located in `/var/run/secrets/kubernetes.io/serviceaccount/token`) and perform actions in the cluster, according to the Service Account permissions. If RBAC is not enabled, the Service Account has unlimited permissions in the cluster. If RBAC is enabled, its permissions are determined by the RoleBindings \ ClusterRoleBindings that are associated with it.
+A service account (SA) represents an application identity in Kubernetes. By default, a service account access token is mounted into every created pod in the cluster, and containers in the pod can send requests to the Kubernetes API server using the service account credentials.
 
-An attacker which get access to the Service Account token can also authenticate and access the Kubernetes API server from outside the cluster and maintain access to the cluster.
+Attackers who get access to a pod can access the service account token (located in `/var/run/secrets/kubernetes.io/serviceaccount/token`) and perform actions in the cluster according to the service account's permissions. If RBAC is not enabled, the service account has unlimited permissions in the cluster. If RBAC is enabled, its permissions are determined by the RoleBindings or ClusterRoleBindings associated with it.
+
+An attacker who obtains the service account token can also authenticate to the Kubernetes API server from outside the cluster and maintain persistent access.
+
+This lab demonstrates both scenarios:
+
+- **`ubuntu.yaml`**: Pod with a custom service account that has `get` and `list` permissions on `namespaces` cluster-wide.
+- **`ubuntu-no-sa.yaml`**: Pod with `automountServiceAccountToken: false`, which prevents the token from being mounted at all.
+
+## Prerequisites
+
+- A running Kind cluster named `workshop-cluster`.
+- `kubectl` installed and configured to connect to your cluster.
 
 ## Quick Start
 
-1. Deploy ubuntu pod
+### Step 1 - Deploy the pod with a mounted service account
 
-    ```bash
-    # create ubuntu pod
-    kubectl apply -f ubuntu.yaml
-    ```
+```bash
+kubectl apply -f ubuntu.yaml
+```
 
-2. Exec into the running container
+Wait for the pod to be ready:
 
-    **kubectl:**
+```bash
+kubectl get pod ubuntu
+```
 
-    ```bash
-    kubectl exec -it pod/ubuntu -- /bin/bash
-    ```
+Expected output:
 
-    **k9s:**
+```
+NAME     READY   STATUS    RESTARTS   AGE
+ubuntu   1/1     Running   0          10s
+```
 
-    Pods `>` ubuntu `>` press `<s>`
+### Step 2 - Exec into the container
 
-3. Install `curl`
+```bash
+kubectl exec -it pod/ubuntu -- /bin/bash
+```
 
-    - `apt-get update && apt-get install curl jq -y`
+### Step 3 - Install curl and jq
 
-4. Move to the `serviceaccount` folder
+```bash
+apt-get update && apt-get install -y curl jq python3
+```
 
-    - `cd /var/run/secrets/kubernetes.io/serviceaccount`
+### Step 4 - Locate and inspect the service account files
 
-5. Analyze the 3 files under the `serviceaccount` folder
+Navigate to the service account directory:
 
-    - ca.crt
-    - namespace
-    - token
+```bash
+cd /var/run/secrets/kubernetes.io/serviceaccount
+ls -la
+```
 
-6. Visualize `token` using <https://jwt.io/> or a similar tool
+Expected output:
 
-7. Query the the Kubernetes api server
+```
+total 4
+drwxrwxrwt 3 root root  140 Jan  1 00:00 .
+drwxr-xr-x 3 root root 4096 Jan  1 00:00 ..
+drwxr-xr-x 2 root root  100 Jan  1 00:00 ..2026_01_01_00_00_00.0000000000
+lrwxrwxrwx 1 root root   32 Jan  1 00:00 ..data -> ..2026_01_01_00_00_00.0000000000
+lrwxrwxrwx 1 root root   13 Jan  1 00:00 ca.crt -> ..data/ca.crt
+lrwxrwxrwx 1 root root   16 Jan  1 00:00 namespace -> ..data/namespace
+lrwxrwxrwx 1 root root   12 Jan  1 00:00 token -> ..data/token
+```
 
-    ```bash
-    curl https://kubernetes.default.svc.cluster.local
-    # ignore tls verification
-    curl https://kubernetes.default.svc.cluster.local -k
-    # pass ca.crt to verify tls connection
-    curl https://kubernetes.default.svc.cluster.local --cacert ca.crt
-    ```
+Note: the timestamp-named directory (e.g. `..2026_01_01_00_00_00.0000000000`) varies per pod. The three important symlinks are `ca.crt`, `namespace`, and `token`.
 
-8. Authenticate using the service account `token`
+Three files are present:
 
-    ```bash
-    export TOKEN=$(cat token)
-    curl --cacert ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces?limit=500 -H "Authorization: Bearer $TOKEN"
-    # Use jq to parse the list of existing namespaces in the cluster
-    curl --cacert ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces?limit=500 -H "Authorization: Bearer $TOKEN" | jq ".items[].metadata.name"
+- **`ca.crt`** — The cluster's certificate authority. Used to verify the API server's TLS certificate.
+- **`namespace`** — The namespace in which this pod runs.
+- **`token`** — A JWT bearer token signed by the cluster. This is the service account credential.
 
-    ```
+Read the namespace and token:
 
-9. Deploy ubuntu pod
+```bash
+cat namespace
+echo ""
+cat token
+```
 
-    ```bash
-    # delete ubuntu pod
-    kubectl delete -f ubuntu.yaml
-    # create ubuntu pod without mounting service account by default
-    kubectl apply -f ubuntu-no-sa.yaml
-    ```
+### Step 5 - Decode the JWT token
 
-10. Try to navigate again to the `serviceaccount` folder (You should get an error)
+The token is a standard JWT. Decode its payload to see which service account it belongs to and when it expires:
 
-    - `kubectl exec -it pod/ubuntu -- /bin/bash`
-    - `cd /var/run/secrets/kubernetes.io/serviceaccount`
+```bash
+# Split on '.' and decode the middle section (payload)
+cat token | cut -d'.' -f2 | base64 -d 2>/dev/null | python3 -m json.tool 2>/dev/null
+```
 
-11. Finalize the lab
+Expected output:
 
-    ```bash
-    # end the lab
-    kubectl delete -f ubuntu-no-sa.yaml
-    kubectl delete -f ubuntu.yaml
-    ```
+```json
+{
+  "aud": ["https://kubernetes.default.svc.cluster.local"],
+  "exp": 1741516800,
+  "iat": 1709980800,
+  "iss": "https://kubernetes.default.svc.cluster.local",
+  "kubernetes.io": {
+    "namespace": "default",
+    "pod": {
+      "name": "ubuntu",
+      "uid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    },
+    "serviceaccount": {
+      "name": "ubuntu-sa",
+      "uid": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+    }
+  },
+  "sub": "system:serviceaccount:default:ubuntu-sa"
+}
+```
+
+You can also paste the token into [https://jwt.io](https://jwt.io) to inspect it visually.
+
+### Step 6 - Call the Kubernetes API with the service account token
+
+Set up environment variables:
+
+```bash
+APISERVER=https://kubernetes.default.svc.cluster.local
+CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+```
+
+First, try without a token — the request is rejected:
+
+```bash
+curl -s --cacert $CACERT $APISERVER/api/v1/namespaces
+```
+
+Expected output:
+
+```json
+{
+  "kind": "Status",
+  "status": "Failure",
+  "message": "namespaces is forbidden: User \"system:anonymous\" cannot list resource \"namespaces\" in API group \"\" at the cluster scope",
+  "reason": "Forbidden",
+  "code": 403
+}
+```
+
+Now authenticate with the token:
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  $APISERVER/api/v1/namespaces | jq '.items[].metadata.name'
+```
+
+Expected output (varies by cluster — at minimum the four system namespaces will appear):
+
+```
+"default"
+"kube-node-lease"
+"kube-public"
+"kube-system"
+```
+
+The service account can list namespaces across the entire cluster because of its ClusterRoleBinding.
+
+### Step 7 - Enumerate what the service account can do
+
+Check all permissions granted to this service account using the `can-i` API:
+
+```bash
+# From inside the pod — check specific permissions
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","spec":{"resourceAttributes":{"namespace":"default","verb":"list","resource":"secrets"}}}' \
+  $APISERVER/apis/authorization.k8s.io/v1/selfsubjectaccessreviews \
+  | jq '.status.allowed'
+```
+
+Expected output:
+
+```
+false
+```
+
+```bash
+# Check namespace listing permission (this one should be allowed)
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","spec":{"resourceAttributes":{"verb":"list","resource":"namespaces"}}}' \
+  $APISERVER/apis/authorization.k8s.io/v1/selfsubjectaccessreviews \
+  | jq '.status.allowed'
+```
+
+Expected output:
+
+```
+true
+```
+
+From outside the pod, you can audit the service account's permissions with:
+
+```bash
+kubectl auth can-i --list --as=system:serviceaccount:default:ubuntu-sa
+```
+
+### Step 8 - Demonstrate the defense: pod without a mounted token
+
+Exit the current pod and redeploy without the service account token:
+
+```bash
+# Exit the pod
+exit
+
+# Delete the current pod and deploy without token mounting
+kubectl delete -f ubuntu.yaml
+kubectl apply -f ubuntu-no-sa.yaml
+```
+
+Wait for the pod:
+
+```bash
+kubectl get pod ubuntu
+```
+
+Exec in and attempt to access the service account directory:
+
+```bash
+kubectl exec -it pod/ubuntu -- /bin/bash
+```
+
+```bash
+ls /var/run/secrets/kubernetes.io/serviceaccount/
+```
+
+Expected output:
+
+```
+ls: cannot access '/var/run/secrets/kubernetes.io/serviceaccount/': No such file or directory
+```
+
+The token directory does not exist. The pod has no Kubernetes API credentials to steal.
+
+## Cleanup
+
+```bash
+kubectl delete -f ubuntu.yaml 2>/dev/null || true
+kubectl delete -f ubuntu-no-sa.yaml 2>/dev/null || true
+```
 
 ## Resources
 
 - [Kubernetes Service Accounts](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+- [Kubernetes RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- [Disabling Automatic Service Account Token Mounting](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting)
+- [MITRE ATT&CK - Valid Accounts: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)

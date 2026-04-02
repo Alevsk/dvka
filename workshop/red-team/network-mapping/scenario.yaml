@@ -1,0 +1,169 @@
+---
+# Namespace: web-apps — simulates a frontend + backend tenant
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web-apps
+  labels:
+    scenario: network-mapping
+
+---
+# Frontend deployment and service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: web-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: web-apps
+spec:
+  selector:
+    app: nginx
+    tier: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+# Backend deployment and service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: web-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: backend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: web-apps
+spec:
+  selector:
+    app: nginx
+    tier: backend
+  ports:
+    - port: 8080
+      targetPort: 80
+
+---
+# Namespace: internal-api — simulates a private API service
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: internal-api
+  labels:
+    scenario: network-mapping
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-api
+  namespace: internal-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: private-api
+  template:
+    metadata:
+      labels:
+        app: private-api
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine3.17-slim
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: private-api
+  namespace: internal-api
+spec:
+  selector:
+    app: private-api
+  ports:
+    - port: 8080
+      targetPort: 80
+
+---
+# Namespace: attacker — the compromised pod with scanning tools
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: attacker
+  labels:
+    scenario: network-mapping
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attacker
+  namespace: attacker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: attacker
+  template:
+    metadata:
+      labels:
+        role: attacker
+    spec:
+      # No network policy restrictions — simulates a breached container
+      containers:
+        - name: attacker
+          image: instrumentisto/nmap:latest
+          # Keep the container running so we can exec into it
+          command: ["sh", "-c", "apk add --no-cache curl bind-tools 2>/dev/null; sleep infinity"]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"

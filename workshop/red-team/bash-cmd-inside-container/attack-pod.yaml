@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: attack-pod
+  namespace: default
+  labels:
+    app: attack-pod
+spec:
+  containers:
+    - name: attack
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - apk add --no-cache curl nmap bind-tools netcat-openbsd 2>/dev/null; sleep 3600
+      imagePullPolicy: IfNotPresent
+  restartPolicy: Never

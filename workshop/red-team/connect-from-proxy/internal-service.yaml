@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: internal-app
+  namespace: default
+  labels:
+    app: internal-app
+spec:
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+  restartPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-service
+  namespace: default
+spec:
+  selector:
+    app: internal-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  # ClusterIP only — not exposed outside the cluster
+  type: ClusterIP

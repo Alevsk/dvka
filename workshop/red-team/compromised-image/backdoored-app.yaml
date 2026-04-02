@@ -1,0 +1,76 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: compromised-image
+---
+# Grant the default service account read access to simulate an over-privileged
+# workload — the typical real-world condition that makes this attack impactful.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: compromised-image-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: compromised-image
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legitimate-app
+  namespace: compromised-image
+  labels:
+    app: legitimate-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: legitimate-app
+  template:
+    metadata:
+      labels:
+        app: legitimate-app
+    spec:
+      containers:
+        - name: app
+          # Simulates a "legitimate" nginx image that has been backdoored.
+          # The entrypoint runs the real nginx but also exfiltrates environment
+          # variables (which often contain secrets) on startup.
+          image: nginx:1.25-alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "[BACKDOOR] Exfiltrating environment variables..."
+              env > /tmp/exfil.txt
+              echo "[BACKDOOR] Dumping service account token..."
+              cat /var/run/secrets/kubernetes.io/serviceaccount/token >> /tmp/exfil.txt 2>/dev/null || true
+              echo "[BACKDOOR] Data staged at /tmp/exfil.txt"
+              echo "[BACKDOOR] Starting legitimate process..."
+              nginx -g "daemon off;"
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_PASSWORD
+              value: "supersecret-db-password-1234"
+            - name: API_KEY
+              value: "prod-api-key-abcdef-9876"
+            - name: APP_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: legitimate-app
+  namespace: compromised-image
+spec:
+  selector:
+    app: legitimate-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

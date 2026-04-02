@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-generator
+  namespace: default
+  labels:
+    app: log-generator
+spec:
+  containers:
+    - name: log-generator
+      image: busybox
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+        - -c
+        - |
+          i=1000
+          while true; do
+            echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] INFO Processing request id=$i"
+            i=$((i + 1))
+            sleep 1
+          done
+  restartPolicy: Never
