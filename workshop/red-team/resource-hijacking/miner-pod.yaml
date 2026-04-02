@@ -28,15 +28,13 @@ spec:
     spec:
       containers:
         - name: "log-agent"
-          image: progrium/stress:latest
-          # Simulate a miner: spawn 2 CPU workers running indefinitely.
-          # The --timeout 0 flag means it runs until the container is killed.
+          image: alpine:latest
+          # Simulate a miner: install stress-ng and spawn 2 CPU workers.
+          # In a real attack this would be xmrig or similar mining binary.
           command:
-            - stress
-            - --cpu
-            - "2"
-            - --timeout
-            - "86400"
+            - /bin/sh
+            - -c
+            - apk add --no-cache stress-ng > /dev/null 2>&1 && stress-ng --cpu 2 --timeout 86400
           resources:
             # No resource limits set — this is intentional to show the
             # danger of running workloads without resource constraints.

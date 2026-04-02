@@ -78,7 +78,28 @@ Delete and recreate **only the pod** (do not re-apply the full YAML, as that wou
 ```bash
 kubectl delete pod ci-runner -n kubeconfig-lab
 kubectl wait --for=delete pod/ci-runner -n kubeconfig-lab --timeout=30s
-kubectl apply -f kubeconfig-exposure.yaml
+
+# Recreate only the pod — NOT the full YAML (which would overwrite the patched secret)
+kubectl run ci-runner -n kubeconfig-lab \
+  --image=alpine:latest \
+  --restart=Never \
+  --overrides='{
+    "spec": {
+      "serviceAccountName": "default",
+      "containers": [{
+        "name": "runner",
+        "image": "alpine:latest",
+        "command": ["/bin/sh", "-c", "apk add --no-cache curl > /dev/null 2>&1 && sleep 3600"],
+        "volumeMounts": [{"name": "kubeconfig-volume", "mountPath": "/root/.kube", "readOnly": false}],
+        "env": [{"name": "KUBECONFIG", "value": "/root/.kube/config"}]
+      }],
+      "volumes": [{
+        "name": "kubeconfig-volume",
+        "secret": {"secretName": "admin-kubeconfig", "items": [{"key": "config", "path": "config"}]}
+      }]
+    }
+  }'
+
 kubectl wait --for=condition=Ready pod/ci-runner -n kubeconfig-lab --timeout=60s
 ```
 

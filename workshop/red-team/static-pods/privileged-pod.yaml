@@ -6,12 +6,27 @@ metadata:
   labels:
     app: node-access
 spec:
-  # Target the control-plane node so the static pod manifests directory
+  # Target a control-plane node so the static pod manifests directory
   # contains the full set of control-plane component manifests.
-  nodeSelector:
-    node-role.kubernetes.io/control-plane: ""
+  #
+  # NOTE: The label value differs by distribution:
+  #   Kind / kubeadm:  node-role.kubernetes.io/control-plane: ""
+  #   k3s / RKE2:      node-role.kubernetes.io/control-plane: "true"
+  #
+  # We use a nodeAffinity expression with the Exists operator, which
+  # matches the label regardless of its value — works on all distributions.
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
   tolerations:
     - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/master
       operator: Exists
       effect: NoSchedule
   containers:

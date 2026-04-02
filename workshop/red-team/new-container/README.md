@@ -92,6 +92,17 @@ cat /etc/kubernetes/admin.conf 2>/dev/null || \
 
 ### Scenario B: Pod mounting the kubelet directory and container runtime socket
 
+> **Note:** The `hostpath-pod.yaml` mounts the containerd socket from the host. The socket path varies by Kubernetes distribution:
+>
+> | Distribution | Path |
+> |---|---|
+> | Kind / kubeadm | `/run/containerd/containerd.sock` |
+> | k3s / RKE2 | `/run/k3s/containerd/containerd.sock` |
+> | MicroK8s | `/var/snap/microk8s/common/run/containerd.sock` |
+> | EKS / AKS / GKE | `/run/containerd/containerd.sock` |
+>
+> Edit the `hostPath.path` in `hostpath-pod.yaml` to match your environment before deploying. If unsure, use a privileged pod to find it: `find /host/run -name "containerd.sock" 2>/dev/null`
+
 #### 1. Deploy the hostpath pod
 
 ```bash

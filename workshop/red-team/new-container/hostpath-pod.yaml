@@ -2,6 +2,23 @@
 # Scenario B: A non-privileged pod that mounts a sensitive host path.
 # Even without full privilege escalation, mounting specific host directories
 # can expose node credentials, container runtime sockets, or SSH keys.
+#
+# NOTE: The containerd socket path varies by distribution. Update the
+# hostPath below to match your environment:
+#
+#   Distribution          Path
+#   --------------------  ------------------------------------------------
+#   Kind / kubeadm        /run/containerd/containerd.sock
+#   k3s                   /run/k3s/containerd/containerd.sock
+#   MicroK8s              /var/snap/microk8s/common/run/containerd.sock
+#   Bottlerocket          /run/dockershim.sock  (containerd via CRI shim)
+#   GKE (cos_containerd)  /run/containerd/containerd.sock
+#   EKS (AL2/AL2023)      /run/containerd/containerd.sock
+#   AKS                   /run/containerd/containerd.sock
+#   RKE2                  /run/k3s/containerd/containerd.sock
+#
+# If unsure, exec into a privileged pod and run:
+#   find /host/run -name "containerd.sock" 2>/dev/null
 apiVersion: v1
 kind: Pod
 metadata:
@@ -27,5 +44,8 @@ spec:
         type: Directory
     - name: containerd-sock
       hostPath:
+        # Default: Kind / kubeadm / EKS / AKS / GKE
+        # For k3s / RKE2, change to: /run/k3s/containerd/containerd.sock
+        # For MicroK8s, change to: /var/snap/microk8s/common/run/containerd.sock
         path: /run/containerd/containerd.sock
         type: Socket
