@@ -14,6 +14,17 @@ If an attacker gains read access to Secrets (directly via `kubectl get secret`, 
 
 This technique is relevant in all major cloud environments. In EKS the node's IAM role often carries `AmazonEC2ContainerRegistryReadOnly`, and in AKS a managed identity attached to the node pool can authenticate to ACR — meaning the attacker does not even need a Kubernetes Secret.
 
+## Why This Matters
+
+> **Attacker Value:** Private container images are a goldmine for adversaries. Pulling images from a compromised registry gives an attacker:
+>
+> - **Proprietary source code** — application logic, algorithms, and business rules baked into image layers.
+> - **Hardcoded secrets and API keys** — credentials embedded in environment variables, config files, or build arguments that were never meant to leave the build pipeline.
+> - **Internal API patterns and endpoints** — service URLs, gRPC definitions, and GraphQL schemas that map the internal architecture.
+> - **Dependency information** — exact package versions and internal libraries that enable targeted supply-chain attacks.
+>
+> Even a single image can expose enough information to pivot deeper into the organization's infrastructure.
+
 ## Prerequisites
 
 - A running Kubernetes cluster (these steps use a Kind cluster named `workshop-cluster`).
@@ -76,29 +87,48 @@ and needs host resolution to the ClusterIP. Run the following setup commands:
 ```bash
 REGISTRY_IP=$(kubectl get svc private-registry -o jsonpath='{.spec.clusterIP}')
 
-# Add DNS resolution for private-registry on every Kind node
+# Step A: Map the registry's ClusterIP to a hostname on every Kind node.
+# Kind nodes run as Docker containers and don't use cluster DNS, so we
+# manually add an /etc/hosts entry so containerd can resolve "private-registry".
 for node in $(kubectl get nodes -o jsonpath='{.items[*].metadata.name}'); do
   docker exec $node sh -c "echo '${REGISTRY_IP} private-registry' >> /etc/hosts"
 done
 
-# Configure containerd to allow insecure HTTP for private-registry:5000
+# Step B: Tell containerd that "private-registry:5000" is an HTTP (not HTTPS)
+# registry. Without this, containerd defaults to TLS and the pull will fail
+# with a certificate error.
+# The hosts.toml file follows the containerd registry host configuration spec:
+#   https://github.com/containerd/containerd/blob/main/docs/hosts.md
 for node in $(kubectl get nodes -o jsonpath='{.items[*].metadata.name}'); do
   docker exec $node sh -c "
+    # Create the per-registry config directory (name must match the registry host:port)
     mkdir -p /etc/containerd/certs.d/private-registry:5000
+
+    # Write the host configuration — capabilities list what operations are
+    # allowed over this insecure transport; skip_verify disables TLS cert checks.
     cat > /etc/containerd/certs.d/private-registry:5000/hosts.toml << 'EOF'
 [host.\"http://private-registry:5000\"]
   capabilities = [\"pull\", \"resolve\", \"push\"]
   skip_verify = true
 EOF
-    # Ensure containerd uses the certs.d directory (append only if not present)
+
+    # Point containerd's CRI plugin at the certs.d directory.
+    # This line is idempotent — it only appends if 'config_path' is not
+    # already present in config.toml. If you see pull errors after this step,
+    # verify that config.toml does not have a conflicting [plugins.*.registry]
+    # section higher up in the file.
     grep -q 'config_path' /etc/containerd/config.toml || \
       printf '\n[plugins.\"io.containerd.grpc.v1.cri\".registry]\n  config_path = \"/etc/containerd/certs.d\"\n' \
       >> /etc/containerd/config.toml
+
+    # Restart containerd to pick up the new registry configuration.
+    # This will briefly make the node NotReady — the sleep below accounts for it.
     systemctl restart containerd
   "
 done
 
-# Wait for nodes to recover after containerd restart
+# Wait for nodes to recover after containerd restart (kubelet needs ~10-15s
+# to re-register once containerd comes back up)
 sleep 15
 kubectl get nodes
 ```

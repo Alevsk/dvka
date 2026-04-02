@@ -41,7 +41,7 @@ Options:
   --help                 Display this help menu.
 
 Available tools:
-  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei, kube_review, static_curl, chisel
+  docker, kind, kubectl, kustomize, k9s, mkcert, kube_hunter, kube_linter, terrascan, kubeaudit, nuclei, kube_review, static_curl, chisel, trivy, skopeo
 EOF
 }
 
@@ -318,6 +318,24 @@ install_chisel() {
   log_done "chisel installed"
 }
 
+# Function to install trivy
+install_trivy() {
+  log_info "Installing trivy"
+  if ! command -v trivy &> /dev/null; then
+    run_cmd "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.58.2"
+  fi
+  log_done "trivy installed"
+}
+
+# Function to install skopeo
+install_skopeo() {
+  log_info "Installing skopeo"
+  if ! command -v skopeo &> /dev/null; then
+    run_cmd "apt-get install -y skopeo"
+  fi
+  log_done "skopeo installed"
+}
+
 install_static_curl() {
   log_info "Installing static-curl"
   if ! command -v static-curl &> /dev/null; then
@@ -343,6 +361,8 @@ install_all_tools() {
   install_kube_review
   install_static_curl
   install_chisel
+  install_trivy
+  install_skopeo
 }
 
 install_selected_tools() {
@@ -363,6 +383,8 @@ install_selected_tools() {
       kube_review) install_kube_review ;;
       static_curl) install_static_curl ;;
       chisel) install_chisel ;;
+      trivy) install_trivy ;;
+      skopeo) install_skopeo ;;
       *)
         printf "Unknown tool: %s\n" "$tool"
         show_help

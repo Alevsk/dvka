@@ -223,6 +223,19 @@ exit
 kubectl delete -f scenario.yaml
 ```
 
+## What's Next
+
+Network mapping is the reconnaissance phase — the services you discover determine which attack techniques apply next. Use the table below to pivot from scan results to hands-on exploitation tutorials.
+
+| Discovery | Port / Indicator | Next Step |
+|---|---|---|
+| Kubelet API listening | `10250/tcp open` | [Access Kubelet API](../access-kubelet-api/README.md) — execute commands in pods via the kubelet |
+| Kubernetes Dashboard | `443/tcp` on dashboard service | [Exposed Sensitive Interfaces](../exposed-sensitive-interfaces/README.md) — unauthenticated cluster-admin via skip-login |
+| Cross-namespace services reachable | Any service responding from another namespace | [Cluster Internal Networking](../cluster-internal-networking/README.md) — abuse flat network to reach internal APIs |
+| Kubernetes API server | `443/tcp` or `6443/tcp` | [Access Kubernetes API](../access-kubernetes-api/README.md) — authenticate and enumerate resources |
+| etcd exposed | `2379/tcp open` | [Exposed Sensitive Interfaces](../exposed-sensitive-interfaces/README.md) — read cluster state and secrets directly from etcd |
+| Service account token available in pod | Token mounted at `/var/run/secrets/` | [Container Service Account](../container-service-account/README.md) — extract and exploit the SA token |
+
 ## Resources
 
 - [nmap](https://nmap.org/)

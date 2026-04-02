@@ -21,6 +21,8 @@ This scenario simulates the runtime phase directly inside a Kind cluster using a
 
 ## Quick Start
 
+This tutorial demonstrates the compromised-image attack using two complementary approaches. The **Dockerfile** (and `backdoor.sh`) shows how an attacker would build a backdoored image in practice — adding a malicious script layer to a legitimate base image and pushing it to a registry. The **YAML manifest** (`backdoored-app.yaml`) simulates the same runtime behavior by overriding the container's entrypoint, so you can reproduce the attack locally in Kind without needing a container registry.
+
 ### 1. Understand the backdoored Dockerfile
 
 Review the example `Dockerfile` and `backdoor.sh` in this directory. The Dockerfile adds a script to nginx's `/docker-entrypoint.d/` directory. When the container starts, nginx's official entrypoint runs every script in that directory before launching the server.
@@ -124,6 +126,55 @@ docker inspect nginx:1.25-alpine | python3 -m json.tool | grep -A5 "Layers"
 ```
 
 Tools like [Trivy](https://github.com/aquasecurity/trivy), [Grype](https://github.com/anchore/grype), and [Docker Scout](https://docs.docker.com/scout/) can detect known malicious layers and suspicious additions in CI pipelines.
+
+## Detection
+
+Defenders can identify compromised images through several layers of inspection:
+
+### 1. Scan images with Trivy before deployment
+
+> **Note:** Trivy must be installed on the host. Install it via `sudo ./install-tools.sh --install trivy` or see the [Trivy installation docs](https://aquasecurity.github.io/trivy/latest/getting-started/installation/).
+
+```bash
+# Scan for known vulnerabilities and misconfigurations
+trivy image nginx:1.25-alpine
+
+# Scan with a stricter policy — fail on HIGH or CRITICAL findings
+trivy image --severity HIGH,CRITICAL --exit-code 1 nginx:1.25-alpine
+```
+
+Integrate Trivy into CI/CD pipelines so backdoored images are caught before they reach the cluster.
+
+### 2. Check for unexpected processes inside running pods
+
+```bash
+kubectl exec -n compromised-image deploy/legitimate-app -- ps aux
+```
+
+Look for processes that should not exist in the container (e.g., reverse shells, crypto miners, or extra shell sessions alongside the expected `nginx` process).
+
+### 3. Monitor outbound network connections
+
+```bash
+# Check active connections from inside the pod
+kubectl exec -n compromised-image deploy/legitimate-app -- \
+  sh -c "netstat -tnp 2>/dev/null || cat /proc/net/tcp"
+```
+
+Unexpected outbound connections to external IPs — especially on uncommon ports — indicate data exfiltration or command-and-control activity.
+
+### 4. Compare image digests against known-good values
+
+```bash
+# Get the digest of the image running in the cluster
+kubectl get pod -n compromised-image -l app=legitimate-app \
+  -o jsonpath='{.items[0].status.containerStatuses[0].imageID}'
+
+# Compare against the official digest
+docker inspect --format='{{index .RepoDigests 0}}' nginx:1.25-alpine
+```
+
+If the digests do not match, the image has been modified. Use admission controllers like [Kyverno](https://kyverno.io/) or [OPA Gatekeeper](https://open-policy-agent.github.io/gatekeeper/) to enforce image digest pinning in production.
 
 ## Cleanup
 

@@ -37,11 +37,13 @@ spec:
     spec:
       containers:
         - name: db
-          image: busybox:1.36
+          image: alpine:3.19
           command:
             - sh
             - -c
             - |
+              # Install openssl for the Ransomware Simulation section
+              apk add --no-cache openssl > /dev/null 2>&1
               # Seed the volume with simulated database files
               mkdir -p /data/db
               echo "CRITICAL_RECORD_001: production data" > /data/db/records.dat

