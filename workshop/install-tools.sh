@@ -322,7 +322,7 @@ install_chisel() {
 install_trivy() {
   log_info "Installing trivy"
   if ! command -v trivy &> /dev/null; then
-    run_cmd "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.58.2"
+    run_cmd "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin"
   fi
   log_done "trivy installed"
 }

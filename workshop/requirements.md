@@ -15,6 +15,8 @@ The following tools are required during the workshop
 - [terrascan](https://github.com/tenable/terrascan/releases/download/v1.18.3/terrascan_1.18.3_Linux_x86_64.tar.gz)
 - [kubeaudit](https://github.com/Shopify/kubeaudit/releases/download/v0.22.0/kubeaudit_0.22.0_linux_amd64.tar.gz)
 - [nuclei](https://github.com/projectdiscovery/nuclei/releases/download/v3.2.9/nuclei_3.2.9_linux_amd64.zip)
+- [trivy](https://github.com/aquasecurity/trivy)
+- [skopeo](https://github.com/containers/skopeo)
 
 > [!IMPORTANT]  
 > There are several ways to start a virtual machine with all the required tools for this workshop, you have to choose one of the following options
@@ -52,7 +54,9 @@ kube-hunter installed .... ✅
 kube-linter installed .... ✅ 
 terrascan installed .... ✅ 
 kubeaudit installed .... ✅ 
-nuclei installed .... ✅ 
+nuclei installed .... ✅
+trivy installed .... ✅
+skopeo installed .... ✅
 apt autoremove completed .... ✅
 ```
 
