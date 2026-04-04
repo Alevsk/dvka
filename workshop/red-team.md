@@ -1,6 +1,6 @@
 # Red Team Techniques
 
-This section provides an overview of common attack techniques used against Kubernetes clusters.
+This section contains hands-on labs covering real-world attack techniques against Kubernetes clusters, organized by the [Threat Matrix for Kubernetes](https://microsoft.github.io/Threat-Matrix-for-Kubernetes/). Each lab includes deployable YAML manifests, step-by-step exploitation instructions, and cleanup procedures. Techniques span initial access, execution, persistence, privilege escalation, defense evasion, credential access, discovery, lateral movement, collection, and impact.
 
 ## Initial Access
 
